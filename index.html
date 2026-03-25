@@ -9,121 +9,93 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
 <style>
-
 body{
-margin:0;
-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
-background:#f5f6f8;
-overflow:hidden;
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
+  overflow:hidden;
 }
 
 .header{
-height:60px;
-background:#0d1117;
-color:white;
-display:flex;
-align-items:center;
-padding:0 20px;
-font-size:18px;
+  height:55px;
+  background:#0d1117;
+  color:white;
+  display:flex;
+  align-items:center;
+  padding:0 20px;
+  font-size:18px;
 }
 
 .container{
-display:flex;
-height:calc(100vh - 60px);
+  display:flex;
+  height:calc(100vh - 55px);
 }
 
-/* 左侧软件列表 */
-.software-list{
-width:220px;
-background:#ffffff;
-border-right:1px solid #e5e5e5;
-overflow:auto;
-padding:15px;
+/* 软件列表 */
+.sidebar{
+  width:260px;
+  background:#fff;
+  border-right:1px solid #ddd;
+  overflow:auto;
+  padding:15px;
 }
 
-.software-list h3{
-font-size:13px;
-color:#666;
-margin-top:15px;
+.sidebar h3{
+  font-size:14px;
+  margin-top:15px;
+  color:#666;
 }
 
-.software-list a{
-
-display:block;
-padding:8px 10px;
-text-decoration:none;
-color:#333;
-border-radius:6px;
-font-size:14px;
+.sidebar a{
+  display:block;
+  padding:6px 10px;
+  text-decoration:none;
+  color:#333;
+  border-radius:5px;
+  font-size:13px;
+  cursor:pointer;
 }
 
-.software-list a:hover{
-background:#f1f3f5;
+.sidebar a:hover{
+  background:#f1f3f5;
 }
 
 /* 目录 */
 .toc{
-width:260px;
-background:#fafafa;
-border-right:1px solid #e5e5e5;
-overflow:auto;
-padding:15px;
-}
-
-.toc h3{
-font-size:13px;
-color:#666;
+  width:260px;
+  background:#fafafa;
+  border-right:1px solid #ddd;
+  overflow:auto;
+  padding:15px;
 }
 
 .toc a{
-
-display:block;
-padding:6px;
-text-decoration:none;
-color:#333;
-border-radius:5px;
-font-size:13px;
+  display:block;
+  padding:5px;
+  font-size:13px;
+  cursor:pointer;
 }
 
-.toc a:hover{
-background:#ececec;
-}
-
-/* PDF区域 */
+/* PDF */
 .viewer{
-flex:1;
-background:#525659;
-overflow:auto;
-text-align:center;
+  flex:1;
+  background:#525659;
+  overflow:auto;
+  text-align:center;
 }
 
 canvas{
-margin:10px auto;
-box-shadow:0 5px 20px rgba(0,0,0,0.3);
+  margin:10px auto;
+  box-shadow:0 5px 20px rgba(0,0,0,0.3);
 }
 
 .toolbar{
-height:45px;
-background:white;
-border-bottom:1px solid #ddd;
-display:flex;
-align-items:center;
-padding:0 10px;
+  background:white;
+  padding:10px;
 }
 
 button{
-margin-right:10px;
-padding:5px 12px;
-border:1px solid #ccc;
-background:white;
-border-radius:5px;
-cursor:pointer;
+  margin-right:10px;
 }
-
-button:hover{
-background:#f1f1f1;
-}
-
 </style>
 
 </head>
@@ -136,27 +108,13 @@ background:#f1f1f1;
 
 <div class="container">
 
-<!-- 软件列表 -->
-<div class="software-list" id="softwareList">
+<div class="sidebar" id="softwareList"></div>
 
-<h3>Rhino</h3>
-<a onclick="loadPDF('rhino/rhino_help.pdf')">Rhino 帮助文档</a>
-
-<h3>Grasshopper</h3>
-<a onclick="loadPDF('grasshopper/grasshopper_help.pdf')">Grasshopper 文档</a>
-
-<h3>Kangaroo2</h3>
-<a onclick="loadPDF('kangaroo2/kangaroo2_help.pdf')">Kangaroo2 文档</a>
-
-</div>
-
-<!-- 目录 -->
 <div class="toc">
 <h3>目录</h3>
 <div id="toc"></div>
 </div>
 
-<!-- PDF -->
 <div class="viewer">
 
 <div class="toolbar">
@@ -172,106 +130,99 @@ background:#f1f1f1;
 </div>
 
 <script>
+// GitHub 仓库信息
+const owner = "zhang1394725324"
+const repo = "SoftwareHelpDoc"
+const branch = "main"
 
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
+// 扫描文件夹并生成软件列表
+async function loadFolders(){
+  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/`);
+  const data = await res.json();
+  const sidebar = document.getElementById("softwareList");
 
-let pdfDoc = null
-let pageNum = 1
-let scale = 1.3
+  data.forEach(item=>{
+    if(item.type==="dir"){
+      loadPDFs(item.name);
+    }
+  })
+}
 
+// 扫描文件夹里的 PDF
+async function loadPDFs(folder){
+  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${folder}?ref=${branch}`);
+  const files = await res.json();
+  const sidebar = document.getElementById("softwareList");
+  const title = document.createElement("h3");
+  title.textContent = folder;
+  sidebar.appendChild(title);
+
+  files.forEach(file=>{
+    if(file.name.endsWith(".pdf")){
+      const link = document.createElement("a");
+      link.textContent = file.name;
+      link.onclick=()=>{ loadPDF(file.download_url) }
+      sidebar.appendChild(link);
+    }
+  })
+}
+
+// PDF.js 初始化
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+let pdfDoc=null, pageNum=1, scale=1.2;
+
+// 加载 PDF
 function loadPDF(url){
-
-pdfjsLib.getDocument(url).promise.then(function(pdf){
-
-pdfDoc = pdf
-pageNum = 1
-renderPage(pageNum)
-loadTOC()
-
-})
-
+  pdfjsLib.getDocument(url).promise.then(pdf=>{
+    pdfDoc = pdf;
+    pageNum = 1;
+    renderPage(pageNum);
+    loadTOC();
+  })
 }
 
+// 渲染页码
 function renderPage(num){
-
-pdfDoc.getPage(num).then(function(page){
-
-let canvas = document.getElementById('pdfCanvas')
-let ctx = canvas.getContext('2d')
-
-let viewport = page.getViewport({scale:scale})
-
-canvas.height = viewport.height
-canvas.width = viewport.width
-
-page.render({canvasContext:ctx,viewport:viewport})
-
-
-document.getElementById('pageInfo').innerText =
-`第 ${num} 页 / ${pdfDoc.numPages}`
-
-})
-
+  pdfDoc.getPage(num).then(page=>{
+    const canvas=document.getElementById("pdfCanvas")
+    const ctx=canvas.getContext("2d")
+    const viewport=page.getViewport({scale})
+    canvas.height=viewport.height
+    canvas.width=viewport.width
+    page.render({canvasContext:ctx,viewport})
+    document.getElementById("pageInfo").innerText=`第 ${num} 页 / ${pdfDoc.numPages}`
+  })
 }
 
-function prevPage(){
-if(pageNum<=1) return
-pageNum--
-renderPage(pageNum)
-}
+function prevPage(){ if(pageNum<=1)return; pageNum--; renderPage(pageNum) }
+function nextPage(){ if(pageNum>=pdfDoc.numPages)return; pageNum++; renderPage(pageNum) }
 
-function nextPage(){
-if(pageNum>=pdfDoc.numPages) return
-pageNum++
-renderPage(pageNum)
-}
-
-
-// 自动获取目录
+// 自动生成 PDF 目录
 function loadTOC(){
-
-pdfDoc.getOutline().then(function(outline){
-
-let toc = document.getElementById('toc')
-toc.innerHTML=''
-
-if(!outline) return
-
-outline.forEach(function(item){
-
-let div = document.createElement('a')
-div.textContent = item.title
-
-
-div.onclick = function(){
-
-pdfDoc.getDestination(item.dest).then(function(dest){
-
-pdfDoc.getPageIndex(dest[0]).then(function(pageIndex){
-
-pageNum = pageIndex + 1
-renderPage(pageNum)
-
-})
-
-})
-
+  pdfDoc.getOutline().then(outline=>{
+    const toc=document.getElementById("toc")
+    toc.innerHTML=""
+    if(!outline)return
+    outline.forEach(item=>{
+      const link=document.createElement("a")
+      link.textContent=item.title
+      link.onclick=()=>{
+        pdfDoc.getDestination(item.dest)
+        .then(dest=>{
+          pdfDoc.getPageIndex(dest[0])
+          .then(index=>{
+            pageNum=index+1
+            renderPage(pageNum)
+          })
+        })
+      }
+      toc.appendChild(link)
+    })
+  })
 }
-
-
-toc.appendChild(div)
-
-})
-
-})
-
-}
-
 
 // 默认加载
-loadPDF('rhino/rhino_help.pdf')
-
+loadFolders()
 </script>
 
 </body>
