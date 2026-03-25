@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>软件帮助文档</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+    background:#f5f6f8;
+}
+
+/* 顶部导航栏 */
+.header{
+    height:60px;
+    background:#0d1117;
+    color:white;
+    display:flex;
+    align-items:center;
+    padding:0 30px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.15);
+}
+
+.header h1{
+    font-size:18px;
+    margin:0;
+    font-weight:500;
+}
+
+/* 主体 */
+.container{
+    display:flex;
+    height:calc(100vh - 60px);
+}
+
+/* 左侧目录 */
+.sidebar{
+    width:260px;
+    background:white;
+    border-right:1px solid #e5e5e5;
+    padding:20px;
+    overflow:auto;
+}
+
+.sidebar h2{
+    font-size:14px;
+    color:#666;
+    margin-bottom:10px;
+}
+
+.sidebar a{
+    display:block;
+    padding:8px 10px;
+    text-decoration:none;
+    color:#333;
+    border-radius:6px;
+    margin-bottom:5px;
+}
+
+.sidebar a:hover{
+    background:#f1f3f5;
+}
+
+/* 右侧阅读区 */
+.content{
+    flex:1;
+    background:#f5f6f8;
+    padding:20px;
+}
+
+.pdf-viewer{
+    width:100%;
+    height:100%;
+    background:white;
+    border-radius:10px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.08);
+    overflow:hidden;
+}
+
+iframe{
+    width:100%;
+    height:100%;
+    border:none;
+}
+
+/* 下载按钮 */
+.download{
+    position:absolute;
+    right:20px;
+    top:15px;
+    background:#238636;
+    color:white;
+    padding:8px 16px;
+    border-radius:6px;
+    text-decoration:none;
+    font-size:14px;
+}
+
+.download:hover{
+    background:#2ea043;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+    <h1>📘 软件帮助文档</h1>
+    
+    <a class="download" href="help.pdf" target="_blank">
+        下载PDF
+    </a>
+    
+</div>
+
+<div class="container">
+
+    <div class="sidebar">
+    
+        <h2>帮助目录</h2>
+        
+        <a href="#" onclick="loadPDF('help.pdf')">📖 完整帮助文档</a>
+        
+        <a href="#" onclick="loadPDF('install.pdf')">⚙️ 安装指南</a>
+        
+        <a href="#" onclick="loadPDF('quickstart.pdf')">🚀 快速开始</a>
+        
+        <a href="#" onclick="loadPDF('faq.pdf')">❓ 常见问题</a>
+        
+    </div>
+
+    <div class="content">
+    
+        <div class="pdf-viewer">
+        
+            <iframe id="pdfFrame" src="help.pdf"></iframe>
+        
+        </div>
+        
+    </div>
+
+</div>
+
+<script>
+
+function loadPDF(file){
+    document.getElementById('pdfFrame').src = file
+}
+
+</script>
+
+</body>
+</html>
