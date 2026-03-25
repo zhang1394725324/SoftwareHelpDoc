@@ -5,16 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>软件帮助中心</title>
 
-<!-- PDF.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-
 <style>
 body{
   margin:0;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
+  background:#f4f5f7;
   overflow:hidden;
 }
 
+/* 顶部 Header */
 .header{
   height:55px;
   background:#0d1117;
@@ -23,8 +23,11 @@ body{
   align-items:center;
   padding:0 20px;
   font-size:18px;
+  font-weight:500;
+  box-shadow:0 2px 10px rgba(0,0,0,0.3);
 }
 
+/* 主容器 */
 .container{
   display:flex;
   height:calc(100vh - 55px);
@@ -32,19 +35,21 @@ body{
 
 /* 软件列表 */
 .sidebar{
-  width:260px;
+  width:240px;
   background:#fff;
   border-right:1px solid #ddd;
   overflow:auto;
-  padding:15px;
+  padding:10px 15px;
 }
 
 .sidebar h3{
   font-size:14px;
   margin-top:15px;
-  color:#666;
+  margin-bottom:5px;
+  color:#444;
 }
 
+/* 软件链接 */
 .sidebar a{
   display:block;
   padding:6px 10px;
@@ -53,106 +58,167 @@ body{
   border-radius:5px;
   font-size:13px;
   cursor:pointer;
+  transition:0.2s;
 }
 
 .sidebar a:hover{
   background:#f1f3f5;
 }
 
-/* 目录 */
+/* 搜索框 */
+#searchBox{
+  width:100%;
+  padding:5px 10px;
+  margin-bottom:10px;
+  border:1px solid #ccc;
+  border-radius:5px;
+  font-size:13px;
+}
+
+/* 目录区域 */
 .toc{
-  width:260px;
+  width:280px;
   background:#fafafa;
   border-right:1px solid #ddd;
   overflow:auto;
-  padding:15px;
+  padding:10px 15px;
 }
 
 .toc a{
   display:block;
-  padding:5px;
+  padding:5px 5px 5px 10px;
   font-size:13px;
   cursor:pointer;
+  border-radius:5px;
+  margin-bottom:2px;
+  transition:0.2s;
 }
 
-/* PDF */
+.toc a:hover{
+  background:#e2e2e2;
+}
+
+/* 多级折叠箭头 */
+.toc .folder::before{
+  content:'▶';
+  display:inline-block;
+  width:12px;
+  transition:0.2s;
+  margin-right:5px;
+}
+
+.toc .folder.expanded::before{
+  transform:rotate(90deg);
+}
+
+/* 子章节缩进 */
+.toc .nested{
+  display:none;
+  padding-left:18px;
+}
+
+.toc .nested a{
+  font-size:12.5px;
+}
+
+/* PDF 区域 */
 .viewer{
   flex:1;
   background:#525659;
   overflow:auto;
   text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
 }
 
-canvas{
-  margin:10px auto;
-  box-shadow:0 5px 20px rgba(0,0,0,0.3);
-}
-
+/* 工具栏 */
 .toolbar{
+  width:100%;
   background:white;
-  padding:10px;
+  padding:8px 10px;
+  display:flex;
+  align-items:center;
+  box-shadow:0 2px 5px rgba(0,0,0,0.1);
+  z-index:10;
 }
 
 button{
   margin-right:10px;
+  padding:5px 12px;
+  border-radius:5px;
+  border:1px solid #ccc;
+  background:white;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+button:hover{
+  background:#f1f1f1;
+}
+
+#pageInfo{
+  font-size:13px;
+  color:#333;
+}
+canvas{
+  margin:10px auto;
+  box-shadow:0 5px 20px rgba(0,0,0,0.3);
 }
 </style>
-
 </head>
-
 <body>
 
-<div class="header">
-📘 软件帮助中心
-</div>
+<div class="header">📘 软件帮助中心</div>
 
 <div class="container">
 
-<div class="sidebar" id="softwareList"></div>
+<!-- 左侧软件列表 -->
+<div class="sidebar">
+<input type="text" id="searchBox" placeholder="搜索软件或章节">
+<div id="softwareList"></div>
+</div>
 
+<!-- 目录 -->
 <div class="toc">
 <h3>目录</h3>
 <div id="toc"></div>
 </div>
 
+<!-- PDF 显示区 -->
 <div class="viewer">
-
 <div class="toolbar">
 <button onclick="prevPage()">上一页</button>
 <button onclick="nextPage()">下一页</button>
 <span id="pageInfo"></span>
 </div>
-
 <canvas id="pdfCanvas"></canvas>
-
-</div>
-
 </div>
 
 <script>
 // GitHub 仓库信息
-const owner = "zhang1394725324"
-const repo = "SoftwareHelpDoc"
-const branch = "main"
+const owner = "zhang1394725324";
+const repo = "SoftwareHelpDoc";
+const branch = "main";
 
-// 扫描文件夹并生成软件列表
+let allLinks = []; // 搜索用
+
 async function loadFolders(){
   const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/`);
   const data = await res.json();
   const sidebar = document.getElementById("softwareList");
-
   data.forEach(item=>{
     if(item.type==="dir"){
       loadPDFs(item.name);
     }
-  })
+  });
 }
 
-// 扫描文件夹里的 PDF
 async function loadPDFs(folder){
   const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${folder}?ref=${branch}`);
   const files = await res.json();
   const sidebar = document.getElementById("softwareList");
+
   const title = document.createElement("h3");
   title.textContent = folder;
   sidebar.appendChild(title);
@@ -161,21 +227,24 @@ async function loadPDFs(folder){
     if(file.name.endsWith(".pdf")){
       const link = document.createElement("a");
       link.textContent = file.name;
-      link.onclick=()=>{ loadPDF(file.download_url) }
+      link.dataset.url = file.download_url;
+      link.onclick=()=>loadPDF(file.download_url);
       sidebar.appendChild(link);
+
+      allLinks.push({name:file.name, url:file.download_url});
     }
-  })
+  });
 }
 
 // PDF.js 初始化
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 let pdfDoc=null, pageNum=1, scale=1.2;
 
 // 加载 PDF
 function loadPDF(url){
   pdfjsLib.getDocument(url).promise.then(pdf=>{
-    pdfDoc = pdf;
-    pageNum = 1;
+    pdfDoc=pdf;
+    pageNum=1;
     renderPage(pageNum);
     loadTOC();
   })
@@ -184,46 +253,73 @@ function loadPDF(url){
 // 渲染页码
 function renderPage(num){
   pdfDoc.getPage(num).then(page=>{
-    const canvas=document.getElementById("pdfCanvas")
-    const ctx=canvas.getContext("2d")
-    const viewport=page.getViewport({scale})
-    canvas.height=viewport.height
-    canvas.width=viewport.width
-    page.render({canvasContext:ctx,viewport})
-    document.getElementById("pageInfo").innerText=`第 ${num} 页 / ${pdfDoc.numPages}`
-  })
+    const canvas=document.getElementById("pdfCanvas");
+    const ctx=canvas.getContext("2d");
+    const viewport=page.getViewport({scale});
+    canvas.height=viewport.height;
+    canvas.width=viewport.width;
+    page.render({canvasContext:ctx,viewport});
+    document.getElementById("pageInfo").innerText=`第 ${num} 页 / ${pdfDoc.numPages}`;
+  });
 }
 
-function prevPage(){ if(pageNum<=1)return; pageNum--; renderPage(pageNum) }
-function nextPage(){ if(pageNum>=pdfDoc.numPages)return; pageNum++; renderPage(pageNum) }
+function prevPage(){ if(pageNum<=1)return; pageNum--; renderPage(pageNum); }
+function nextPage(){ if(pageNum>=pdfDoc.numPages)return; pageNum++; renderPage(pageNum); }
 
-// 自动生成 PDF 目录
+// 多级目录折叠
 function loadTOC(){
   pdfDoc.getOutline().then(outline=>{
-    const toc=document.getElementById("toc")
-    toc.innerHTML=""
-    if(!outline)return
+    const toc=document.getElementById("toc");
+    toc.innerHTML="";
+    if(!outline)return;
+
     outline.forEach(item=>{
-      const link=document.createElement("a")
-      link.textContent=item.title
-      link.onclick=()=>{
-        pdfDoc.getDestination(item.dest)
-        .then(dest=>{
-          pdfDoc.getPageIndex(dest[0])
-          .then(index=>{
-            pageNum=index+1
-            renderPage(pageNum)
-          })
-        })
-      }
-      toc.appendChild(link)
-    })
-  })
+      createTOCItem(toc, item);
+    });
+  });
 }
 
-// 默认加载
-loadFolders()
-</script>
+function createTOCItem(parent, item){
+  const a=document.createElement("a");
+  a.textContent=item.title;
+  if(item.items && item.items.length>0){
+    a.classList.add("folder");
+    const nested = document.createElement("div");
+    nested.classList.add("nested");
+    item.items.forEach(sub=>{
+      createTOCItem(nested, sub);
+    });
+    a.onclick=()=>nested.style.display = (nested.style.display==="block"?"none":"block");
+    parent.appendChild(a);
+    parent.appendChild(nested);
+  } else {
+    a.onclick=()=>{
+      pdfDoc.getDestination(item.dest)
+      .then(dest=> pdfDoc.getPageIndex(dest[0]))
+      .then(index=>{
+        pageNum=index+1;
+        renderPage(pageNum);
+      });
+    };
+    parent.appendChild(a);
+  }
+}
 
+// 搜索功能
+document.getElementById("searchBox").addEventListener("input", e=>{
+  const q=e.target.value.toLowerCase();
+  const softwareLinks = document.querySelectorAll(".sidebar a");
+  softwareLinks.forEach(link=>{
+    if(link.textContent.toLowerCase().includes(q)){
+      link.style.display="block";
+    } else {
+      link.style.display="none";
+    }
+  });
+});
+
+// 初始化
+loadFolders();
+</script>
 </body>
 </html>
