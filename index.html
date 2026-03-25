@@ -6,6 +6,7 @@
 <title>软件帮助中心</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
 <style>
 body{
   margin:0;
@@ -33,18 +34,27 @@ body{
   height:calc(100vh - 55px);
 }
 
-/* 软件列表 */
+/* 左侧软件列表 */
 .sidebar{
-  width:240px;
+  width:220px;
   background:#fff;
   border-right:1px solid #ddd;
   overflow:auto;
-  padding:10px 15px;
+  padding:10px 10px;
+}
+
+#searchBox{
+  width:100%;
+  padding:5px 8px;
+  margin-bottom:8px;
+  border:1px solid #ccc;
+  border-radius:5px;
+  font-size:13px;
 }
 
 .sidebar h3{
   font-size:14px;
-  margin-top:15px;
+  margin-top:10px;
   margin-bottom:5px;
   color:#444;
 }
@@ -52,7 +62,7 @@ body{
 /* 软件链接 */
 .sidebar a{
   display:block;
-  padding:6px 10px;
+  padding:5px 8px;
   text-decoration:none;
   color:#333;
   border-radius:5px;
@@ -65,23 +75,17 @@ body{
   background:#f1f3f5;
 }
 
-/* 搜索框 */
-#searchBox{
-  width:100%;
-  padding:5px 10px;
-  margin-bottom:10px;
-  border:1px solid #ccc;
-  border-radius:5px;
-  font-size:13px;
-}
-
-/* 目录区域 */
+/* 中间目录 */
 .toc{
-  width:280px;
+  width:260px;
   background:#fafafa;
   border-right:1px solid #ddd;
   overflow:auto;
-  padding:10px 15px;
+  padding:10px 10px;
+}
+
+.toc h3{
+  margin-top:0;
 }
 
 .toc a{
@@ -161,12 +165,14 @@ button:hover{
   font-size:13px;
   color:#333;
 }
+
 canvas{
   margin:10px auto;
   box-shadow:0 5px 20px rgba(0,0,0,0.3);
 }
 </style>
 </head>
+
 <body>
 
 <div class="header">📘 软件帮助中心</div>
@@ -175,11 +181,11 @@ canvas{
 
 <!-- 左侧软件列表 -->
 <div class="sidebar">
-<input type="text" id="searchBox" placeholder="搜索软件或章节">
+<input type="text" id="searchBox" placeholder="搜索软件或PDF">
 <div id="softwareList"></div>
 </div>
 
-<!-- 目录 -->
+<!-- 中间目录 -->
 <div class="toc">
 <h3>目录</h3>
 <div id="toc"></div>
@@ -202,11 +208,14 @@ const repo = "SoftwareHelpDoc";
 const branch = "main";
 
 let allLinks = []; // 搜索用
+let pdfDoc=null, pageNum=1, scale=1.2;
 
+// 自动扫描文件夹生成软件列表
 async function loadFolders(){
   const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/`);
   const data = await res.json();
   const sidebar = document.getElementById("softwareList");
+  sidebar.innerHTML="";
   data.forEach(item=>{
     if(item.type==="dir"){
       loadPDFs(item.name);
@@ -238,7 +247,6 @@ async function loadPDFs(folder){
 
 // PDF.js 初始化
 pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-let pdfDoc=null, pageNum=1, scale=1.2;
 
 // 加载 PDF
 function loadPDF(url){
@@ -272,10 +280,7 @@ function loadTOC(){
     const toc=document.getElementById("toc");
     toc.innerHTML="";
     if(!outline)return;
-
-    outline.forEach(item=>{
-      createTOCItem(toc, item);
-    });
+    outline.forEach(item=>createTOCItem(toc, item));
   });
 }
 
@@ -286,40 +291,32 @@ function createTOCItem(parent, item){
     a.classList.add("folder");
     const nested = document.createElement("div");
     nested.classList.add("nested");
-    item.items.forEach(sub=>{
-      createTOCItem(nested, sub);
-    });
-    a.onclick=()=>nested.style.display = (nested.style.display==="block"?"none":"block");
+    item.items.forEach(sub=>createTOCItem(nested, sub));
+    a.onclick=()=>nested.style.display=(nested.style.display==="block"?"none":"block");
     parent.appendChild(a);
     parent.appendChild(nested);
   } else {
     a.onclick=()=>{
       pdfDoc.getDestination(item.dest)
       .then(dest=> pdfDoc.getPageIndex(dest[0]))
-      .then(index=>{
-        pageNum=index+1;
-        renderPage(pageNum);
-      });
+      .then(index=>{ pageNum=index+1; renderPage(pageNum); });
     };
     parent.appendChild(a);
   }
 }
 
-// 搜索功能
+// 搜索软件或 PDF
 document.getElementById("searchBox").addEventListener("input", e=>{
   const q=e.target.value.toLowerCase();
   const softwareLinks = document.querySelectorAll(".sidebar a");
   softwareLinks.forEach(link=>{
-    if(link.textContent.toLowerCase().includes(q)){
-      link.style.display="block";
-    } else {
-      link.style.display="none";
-    }
+    link.style.display = link.textContent.toLowerCase().includes(q)?"block":"none";
   });
 });
 
 // 初始化
 loadFolders();
 </script>
+
 </body>
 </html>
