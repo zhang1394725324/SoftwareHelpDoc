@@ -492,7 +492,6 @@ const res = await fetch(
 `https://api.github.com/repos/${owner}/${repo}/contents`
 );
 
-// 检查响应是否成功
 if (!res.ok) {
 const errorData = await res.json();
 throw new Error(`GitHub API Error: ${res.status} - ${errorData.message || res.statusText}`);
@@ -512,10 +511,8 @@ await loadPDFs(folder.name, softwareList);
 }
 } catch (error) {
 console.error("Error loading folders from GitHub:", error);
-showLoadingOverlay(`加载失败: ${error.message || "未知错误"}. 请检查网络或API限制。`);
-// 也可以选择在这里显示一个更友好的错误消息
+showLoadingOverlay(`加载软件目录失败: ${error.message || "未知错误"}. 请检查网络或API限制。`);
 } finally {
-// 无论成功或失败，都隐藏加载提示
 hideLoadingOverlay();
 }
 }
@@ -566,7 +563,7 @@ return;
 currentPdfUrl = url;
 
 document.getElementById("currentPDF").innerText = name.replace(/\.pdf$/, '');
-document.getElementById("toc").innerHTML = '<h3>PDF 目录</h3>';
+document.getElementById("toc").innerHTML = '<h3>PDF 目录</h3>'; // 清空并重置 TOC 内容
 
 pdfjsLib.getDocument(url).promise.then(pdf => {
 pdfDoc = pdf;
@@ -574,7 +571,16 @@ pageNum = 1;
 renderPage(pageNum);
 }).catch(error => {
 console.error("Error loading PDF:", error);
-alert("加载 PDF 失败，请稍后再试。");
+// 弹窗显示更详细的错误信息
+let errorMessage = `加载 PDF "${name}" 失败: `;
+if (error instanceof Error) {
+errorMessage += error.message;
+} else if (typeof error === 'object' && error !== null && error.name && error.message) {
+errorMessage += `${error.name}: ${error.message}`;
+} else {
+errorMessage += "未知错误。请检查 PDF 文件是否损坏或网络连接。";
+}
+alert(errorMessage);
 });
 }
 
@@ -610,6 +616,7 @@ updateActiveTocLink(num);
 
 }).catch(error => {
 console.error("Error rendering page:", error);
+alert(`渲染页面 ${num} 失败: ${error.message || "未知错误"}`);
 });
 }
 
@@ -642,20 +649,37 @@ a.textContent = item.title;
 a.href = "#";
 a.onclick = (e) => {
 e.preventDefault();
+// 处理不同类型的目的地格式
 pdfDoc.getDestination(item.dest)
 .then(dest => {
-if (Array.isArray(dest) && dest.length > 0) {
-return pdfDoc.getPageIndex(dest[0]);
-} else if (typeof dest === 'string') {
-return pdfDoc.getPageIndex(dest);
+if (dest === null) {
+console.warn(`Destination for "${item.title}" is null. Cannot navigate.`);
+return Promise.reject("Destination is null");
 }
-return Promise.reject("Invalid destination");
+
+let pageRef;
+// dest 可以是一个数组 [pageRef, ...] 或一个命名字符串
+if (Array.isArray(dest)) {
+pageRef = dest[0]; // 第一个元素通常是页面的 PDFRef
+} else if (typeof dest === 'string') {
+// 如果是命名目的地，pdf.js 会自动处理为正确的 PDFRef
+pageRef = dest;
+} else {
+console.warn(`Unsupported destination format for "${item.title}":`, dest);
+return Promise.reject("Unsupported destination format");
+}
+
+// getPageIndex 期望一个 PDFRef 或命名字符串
+return pdfDoc.getPageIndex(pageRef);
 })
 .then(index => {
-pageNum = index + 1;
+pageNum = index + 1; // 转换为基于1的页码
 renderPage(pageNum);
 })
-.catch(error => console.error("Error navigating to destination:", error));
+.catch(error => {
+console.error(`Error navigating to "${item.title}":`, error);
+alert(`无法跳转到目录章节 "${item.title}"。原因: ${error.message || "未知错误"}`);
+});
 };
 parent.appendChild(a);
 
@@ -676,7 +700,7 @@ toc.innerHTML += '<p style="padding: 10px 15px; color: #666;">此 PDF 没有目�
 
 }).catch(error => {
 console.error("Error loading TOC:", error);
-document.getElementById("toc").innerHTML = '<h3>PDF 目录</h3><p style="padding: 10px 15px; color: #666;">加载目录失败。</p>';
+document.getElementById("toc").innerHTML = `<h3>PDF 目录</h3><p style="padding: 10px 15px; color: #666;">加载目录失败: ${error.message || "未知错误"}</p>`;
 });
 }
 
@@ -686,8 +710,11 @@ tocLinks.forEach(link => link.classList.remove("active-link"));
 
 if (!pdfDoc) return;
 
-let closestLink = null;
-let minDistance = Infinity;
+// We need a robust way to map outline items to page numbers
+// Cache results if possible to avoid re-calculating on every page render
+if (!pdfDoc._outlinePageMap) {
+pdfDoc._outlinePageMap = new Map();
+}
 
 pdfDoc.getOutline().then(outline => {
 const flatOutline = [];
@@ -701,23 +728,42 @@ if (item.items) flattenOutline(item.items);
 flattenOutline(outline);
 
 const promises = flatOutline.map(item => {
+if (pdfDoc._outlinePageMap.has(item)) {
+return Promise.resolve({ item, pageIndex: pdfDoc._outlinePageMap.get(item) });
+}
+
 return pdfDoc.getDestination(item.dest)
 .then(dest => {
-if (Array.isArray(dest) && dest.length > 0) {
-return pdfDoc.getPageIndex(dest[0]).then(index => ({ item, pageIndex: index + 1 }));
+if (dest === null) return null;
+
+let pageRef;
+if (Array.isArray(dest)) {
+pageRef = dest[0];
 } else if (typeof dest === 'string') {
-return pdfDoc.getPageIndex(dest).then(index => ({ item, pageIndex: index + 1 }));
-}
+pageRef = dest;
+} else {
 return null;
+}
+return pdfDoc.getPageIndex(pageRef)
+.then(index => {
+const pageNum = index + 1;
+pdfDoc._outlinePageMap.set(item, pageNum); // Cache the result
+return { item, pageIndex: pageNum };
+})
+.catch(() => null);
 })
 .catch(() => null);
 });
 
 Promise.all(promises).then(results => {
+let closestLink = null;
+let minDistance = Infinity;
+
 results.forEach(result => {
 if (result && result.pageIndex <= currentPage) {
 const distance = currentPage - result.pageIndex;
-if (distance < minDistance) {
+// Prioritize closer links, then links that appeared earlier in the outline (smaller index in flatOutline)
+if (distance < minDistance || (distance === minDistance && flatOutline.indexOf(result.item) < flatOutline.indexOf(closestLink))) {
 minDistance = distance;
 closestLink = result.item;
 }
