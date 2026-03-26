@@ -19,7 +19,7 @@ background:#f5f6fa;
 overflow:hidden;
 }
 
-/* 顶部导航 */
+/* 顶部 */
 
 .header{
 
@@ -28,18 +28,81 @@ background:#0d1117;
 color:white;
 display:flex;
 align-items:center;
-justify-content:center;
-font-size:16px;
-position:relative;
+padding:0 15px;
+gap:15px;
+
 }
+
+.menuBtn{
+
+display:flex;
+align-items:center;
+gap:6px;
+cursor:pointer;
+padding:6px 10px;
+border-radius:6px;
+
+}
+
+.menuBtn:hover{
+
+background:#30363d;
+
+}
+
+.menuBtn.active{
+
+background:#1f6feb;
+
+}
+
+/* 三条杠 */
+
+.hamburger span{
+
+display:block;
+width:16px;
+height:2px;
+background:white;
+margin:3px 0;
+
+}
+
+/* 当前PDF */
 
 .currentPDF{
 
+flex:1;
+text-align:center;
 font-weight:600;
 
 }
 
-/* 左侧栏 */
+/* 搜索 */
+
+.searchBox{
+
+display:flex;
+gap:5px;
+
+}
+
+.searchBox input{
+
+padding:5px;
+border-radius:4px;
+border:none;
+
+}
+
+.searchBox button{
+
+padding:5px 10px;
+cursor:pointer;
+
+}
+
+/* 左侧 */
 
 .sidebar{
 
@@ -52,50 +115,12 @@ background:white;
 border-right:1px solid #ddd;
 overflow:auto;
 transition:.3s;
-z-index:1000;
 
 }
 
 .sidebar.hidden{
 
 transform:translateX(-260px);
-
-}
-
-/* 折叠按钮 */
-
-.toggleBtn{
-
-position:fixed;
-top:70px;
-left:20px;
-width:50px;
-height:50px;
-background:white;
-border-radius:12px;
-box-shadow:0 4px 20px rgba(0,0,0,0.15);
-display:flex;
-align-items:center;
-justify-content:center;
-cursor:pointer;
-z-index:2000;
-transition:.3s;
-
-}
-
-.toggleBtn:hover{
-
-transform:scale(1.05);
-
-}
-
-.toggleBtn span{
-
-display:block;
-width:20px;
-height:2px;
-background:#333;
-margin:3px 0;
 
 }
 
@@ -106,8 +131,8 @@ margin:3px 0;
 position:fixed;
 top:55px;
 left:260px;
-width:260px;
 bottom:0;
+width:260px;
 background:#fafafa;
 border-right:1px solid #ddd;
 overflow:auto;
@@ -121,7 +146,7 @@ transform:translateX(-260px);
 
 }
 
-/* 主区域 */
+/* 阅读区 */
 
 .viewer{
 
@@ -135,22 +160,14 @@ transition:.3s;
 
 }
 
-.sidebar.hidden + .toc + .viewer{
-
-margin-left:0;
-
-}
-
-/* PDF画布 */
-
 canvas{
 
 margin:20px auto;
-box-shadow:0 5px 25px rgba(0,0,0,0.4);
+box-shadow:0 5px 25px rgba(0,0,0,.4);
 
 }
 
-/* 左右翻页按钮 */
+/* 翻页按钮 */
 
 .pageArrow{
 
@@ -159,9 +176,9 @@ top:50%;
 transform:translateY(-50%);
 width:50px;
 height:80px;
-background:rgba(0,0,0,0.3);
+background:rgba(0,0,0,.3);
 color:white;
-font-size:30px;
+font-size:28px;
 display:flex;
 align-items:center;
 justify-content:center;
@@ -182,41 +199,18 @@ right:20px;
 
 }
 
-/* 加载动画 */
+/* 底部翻页 */
 
-.loading{
+.pageToolbar{
 
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
 color:white;
-font-size:18px;
+margin-bottom:20px;
 
 }
 
-/* 首页 */
+button{
 
-.home{
-
-display:flex;
-align-items:center;
-justify-content:center;
-height:100%;
-color:white;
-font-size:24px;
-
-}
-
-/* 搜索 */
-
-.search{
-
-width:90%;
-margin:10px;
-padding:6px;
-border-radius:6px;
-border:1px solid #ddd;
+cursor:pointer;
 
 }
 
@@ -237,7 +231,6 @@ background:#eee;
 .active{
 
 background:#e6f3ff;
-border-left:3px solid #0078ff;
 
 }
 
@@ -249,65 +242,85 @@ border-left:3px solid #0078ff;
 
 <div class="header">
 
+<div class="menuBtn" onclick="toggleSidebar()" id="btnSidebar">
+
+<div class="hamburger">
+
+<span></span>
+<span></span>
+<span></span>
+
+</div>
+
+软件目录
+
+</div>
+
+<div class="menuBtn" onclick="toggleToc()" id="btnToc">
+
+<div class="hamburger">
+
+<span></span>
+<span></span>
+<span></span>
+
+</div>
+
+目录
+
+</div>
+
 <div class="currentPDF" id="currentPDF">
 
 软件帮助中心
 
 </div>
 
-</div>
+<div class="searchBox">
 
-<div class="toggleBtn" onclick="toggleSidebar()">
+<input id="searchBox" placeholder="搜索章节">
 
-<span></span>
-<span></span>
-<span></span>
+<button onclick="search()">🔍</button>
 
 </div>
 
-<div class="sidebar">
+</div>
 
-<input class="search" id="searchBox" placeholder="搜索">
+<div class="sidebar" id="sidebar">
 
 <div id="softwareList"></div>
 
 </div>
 
-<div class="toc">
+<div class="toc" id="tocPanel">
 
 <div id="toc"></div>
 
 </div>
 
-<div class="viewer" id="viewer">
-
-<div class="home" id="home">
-
-请选择左侧软件帮助文档
-
-</div>
+<div class="viewer">
 
 <canvas id="pdfCanvas"></canvas>
 
-</div>
+<div class="pageToolbar">
 
-<div class="pageArrow leftArrow" onclick="prevPage()">
+<button onclick="prevPage()">上一页</button>
 
-‹
+<span id="pageInfo"></span>
 
-</div>
-
-<div class="pageArrow rightArrow" onclick="nextPage()">
-
-›
+<button onclick="nextPage()">下一页</button>
 
 </div>
+
+</div>
+
+<div class="pageArrow leftArrow" onclick="prevPage()">‹</div>
+<div class="pageArrow rightArrow" onclick="nextPage()">›</div>
 
 <script>
 
 const owner="zhang1394725324"
 const repo="SoftwareHelpDoc"
-const branch="main"
 
 let pdfDoc=null
 let pageNum=1
@@ -318,8 +331,21 @@ pdfjsLib.GlobalWorkerOptions.workerSrc=
 
 function toggleSidebar(){
 
-document.querySelector(".sidebar").classList.toggle("hidden")
-document.querySelector(".toc").classList.toggle("hidden")
+document.getElementById("sidebar")
+.classList.toggle("hidden")
+
+document.getElementById("btnSidebar")
+.classList.toggle("active")
+
+}
+
+function toggleToc(){
+
+document.getElementById("tocPanel")
+.classList.toggle("hidden")
+
+document.getElementById("btnToc")
+.classList.toggle("active")
 
 }
 
@@ -356,7 +382,6 @@ const files=await res.json()
 const list=document.getElementById("softwareList")
 
 const title=document.createElement("h3")
-
 title.textContent=folder
 
 list.appendChild(title)
@@ -369,7 +394,7 @@ const a=document.createElement("a")
 
 a.textContent=file.name
 
-a.onclick=()=>loadPDF(file.download_url,file.name,a)
+a.onclick=()=>loadPDF(file.download_url,file.name)
 
 list.appendChild(a)
 
@@ -381,16 +406,10 @@ list.appendChild(a)
 
 /* 加载PDF */
 
-function loadPDF(url,name,link){
+function loadPDF(url,name){
 
-document.getElementById("home").style.display="none"
-
-document.querySelectorAll(".sidebar a")
-.forEach(a=>a.classList.remove("active"))
-
-link.classList.add("active")
-
-document.getElementById("currentPDF").innerText=name
+document.getElementById("currentPDF")
+.innerText=name
 
 pdfjsLib.getDocument(url).promise.then(pdf=>{
 
@@ -398,13 +417,12 @@ pdfDoc=pdf
 pageNum=1
 
 renderPage(pageNum)
+
 loadTOC()
 
 })
 
 }
-
-/* 渲染 */
 
 function renderPage(num){
 
@@ -426,11 +444,12 @@ viewport
 
 })
 
+document.getElementById("pageInfo")
+.innerText=`${num} / ${pdfDoc.numPages}`
+
 })
 
 }
-
-/* 翻页 */
 
 function prevPage(){
 
@@ -475,7 +494,6 @@ pdfDoc.getDestination(item.dest)
 .then(index=>{
 
 pageNum=index+1
-
 renderPage(pageNum)
 
 })
@@ -500,12 +518,12 @@ outline.forEach(i=>create(i,toc))
 
 /* 搜索 */
 
-document.getElementById("searchBox")
-.addEventListener("input",function(){
+function search(){
 
-const q=this.value.toLowerCase()
+const q=document.getElementById("searchBox")
+.value.toLowerCase()
 
-document.querySelectorAll(".sidebar a")
+document.querySelectorAll("#toc a")
 .forEach(a=>{
 
 a.style.display=
@@ -514,7 +532,7 @@ a.textContent.toLowerCase().includes(q)
 
 })
 
-})
+}
 
 loadFolders()
 
