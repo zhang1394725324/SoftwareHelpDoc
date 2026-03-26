@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 
 <head>
 
@@ -15,8 +15,8 @@
 body{
 margin:0;
 font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
-background:#f5f6fa;
 overflow:hidden;
+background:#f5f6fa;
 }
 
 /* 顶部 */
@@ -33,14 +33,17 @@ gap:15px;
 
 }
 
+/* 三条杠按钮 */
+
 .menuBtn{
 
 display:flex;
 align-items:center;
 gap:6px;
 cursor:pointer;
-padding:6px 10px;
+padding:6px 12px;
 border-radius:6px;
+transition:.2s;
 
 }
 
@@ -55,8 +58,6 @@ background:#30363d;
 background:#1f6feb;
 
 }
-
-/* 三条杠 */
 
 .hamburger span{
 
@@ -83,40 +84,65 @@ font-weight:600;
 .searchBox{
 
 display:flex;
-gap:5px;
+align-items:center;
+gap:6px;
 
 }
 
 .searchBox input{
 
-padding:5px;
+padding:6px;
 border-radius:4px;
 border:none;
+width:180px;
 
 }
 
-.searchBox button{
+.searchBtn{
 
-padding:5px 10px;
+display:flex;
+align-items:center;
+gap:4px;
+padding:6px 10px;
 cursor:pointer;
+border-radius:5px;
+background:#30363d;
+}
+
+.searchBtn:hover{
+
+background:#1f6feb;
 
 }
 
-/* 左侧 */
+/* 侧边栏 */
 
 .sidebar{
 
 position:fixed;
 top:55px;
-left:0;
 bottom:0;
 width:260px;
 background:white;
-border-right:1px solid #ddd;
 overflow:auto;
+border-right:1px solid #ddd;
 transition:.3s;
 
 }
+
+#sidebar{
+
+left:0;
+
+}
+
+#tocPanel{
+
+left:260px;
+
+}
+
+/* 隐藏 */
 
 .sidebar.hidden{
 
@@ -124,58 +150,54 @@ transform:translateX(-260px);
 
 }
 
-/* 目录 */
-
-.toc{
-
-position:fixed;
-top:55px;
-left:260px;
-bottom:0;
-width:260px;
-background:#fafafa;
-border-right:1px solid #ddd;
-overflow:auto;
-transition:.3s;
-
-}
-
-.toc.hidden{
-
-transform:translateX(-260px);
-
-}
-
-/* 阅读区 */
+/* PDF区 */
 
 .viewer{
 
-margin-left:520px;
-margin-top:55px;
-height:calc(100vh - 55px);
-overflow:auto;
+position:fixed;
+top:55px;
+right:0;
+bottom:0;
+left:520px;
 background:#525659;
+overflow:auto;
 text-align:center;
 transition:.3s;
 
 }
 
-canvas{
+/* 响应 */
 
-margin:20px auto;
-box-shadow:0 5px 25px rgba(0,0,0,.4);
+.viewer.full1{
+
+left:260px;
 
 }
 
-/* 翻页按钮 */
+.viewer.full2{
+
+left:0;
+
+}
+
+/* PDF */
+
+canvas{
+
+margin:20px auto;
+box-shadow:0 5px 20px rgba(0,0,0,.4);
+
+}
+
+/* 翻页箭头 */
 
 .pageArrow{
 
 position:fixed;
 top:50%;
 transform:translateY(-50%);
-width:50px;
-height:80px;
+width:45px;
+height:70px;
 background:rgba(0,0,0,.3);
 color:white;
 font-size:28px;
@@ -189,7 +211,7 @@ border-radius:6px;
 
 .leftArrow{
 
-left:520px;
+left:540px;
 
 }
 
@@ -199,12 +221,21 @@ right:20px;
 
 }
 
-/* 底部翻页 */
+/* 底部工具栏 */
 
 .pageToolbar{
 
+position:fixed;
+bottom:15px;
+left:50%;
+transform:translateX(-50%);
+background:rgba(0,0,0,.5);
 color:white;
-margin-bottom:20px;
+padding:8px 15px;
+border-radius:8px;
+display:flex;
+gap:15px;
+align-items:center;
 
 }
 
@@ -245,11 +276,9 @@ background:#e6f3ff;
 <div class="menuBtn" onclick="toggleSidebar()" id="btnSidebar">
 
 <div class="hamburger">
-
 <span></span>
 <span></span>
 <span></span>
-
 </div>
 
 软件目录
@@ -259,14 +288,12 @@ background:#e6f3ff;
 <div class="menuBtn" onclick="toggleToc()" id="btnToc">
 
 <div class="hamburger">
-
 <span></span>
 <span></span>
 <span></span>
-
 </div>
 
-目录
+PDF目录
 
 </div>
 
@@ -280,7 +307,11 @@ background:#e6f3ff;
 
 <input id="searchBox" placeholder="搜索章节">
 
-<button onclick="search()">🔍</button>
+<div class="searchBtn" onclick="search()">
+
+🔍 搜索
+
+</div>
 
 </div>
 
@@ -292,30 +323,30 @@ background:#e6f3ff;
 
 </div>
 
-<div class="toc" id="tocPanel">
+<div class="sidebar" id="tocPanel">
 
 <div id="toc"></div>
 
 </div>
 
-<div class="viewer">
+<div class="viewer" id="viewer">
 
 <canvas id="pdfCanvas"></canvas>
-
-<div class="pageToolbar">
-
-<button onclick="prevPage()">上一页</button>
-
-<span id="pageInfo"></span>
-
-<button onclick="nextPage()">下一页</button>
-
-</div>
 
 </div>
 
 <div class="pageArrow leftArrow" onclick="prevPage()">‹</div>
 <div class="pageArrow rightArrow" onclick="nextPage()">›</div>
+
+<div class="pageToolbar">
+
+<button onclick="prevPage()">上一页</button>
+
+<span id="pageInfo">0 / 0</span>
+
+<button onclick="nextPage()">下一页</button>
+
+</div>
 
 <script>
 
@@ -324,12 +355,38 @@ const repo="SoftwareHelpDoc"
 
 let pdfDoc=null
 let pageNum=1
-let scale=1.2
+
+let sidebarOpen=true
+let tocOpen=true
 
 pdfjsLib.GlobalWorkerOptions.workerSrc=
 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
 
+function updateViewer(){
+
+const viewer=document.getElementById("viewer")
+
+if(sidebarOpen && tocOpen){
+
+viewer.className="viewer"
+
+}else if(sidebarOpen || tocOpen){
+
+viewer.className="viewer full1"
+
+}else{
+
+viewer.className="viewer full2"
+
+}
+
+}
+
+/* 软件目录 */
+
 function toggleSidebar(){
+
+sidebarOpen=!sidebarOpen
 
 document.getElementById("sidebar")
 .classList.toggle("hidden")
@@ -337,15 +394,23 @@ document.getElementById("sidebar")
 document.getElementById("btnSidebar")
 .classList.toggle("active")
 
+updateViewer()
+
 }
 
+/* PDF目录 */
+
 function toggleToc(){
+
+tocOpen=!tocOpen
 
 document.getElementById("tocPanel")
 .classList.toggle("hidden")
 
 document.getElementById("btnToc")
 .classList.toggle("active")
+
+updateViewer()
 
 }
 
@@ -417,12 +482,13 @@ pdfDoc=pdf
 pageNum=1
 
 renderPage(pageNum)
-
 loadTOC()
 
 })
 
 }
+
+/* 渲染 */
 
 function renderPage(num){
 
@@ -432,7 +498,7 @@ const canvas=document.getElementById("pdfCanvas")
 
 const ctx=canvas.getContext("2d")
 
-const viewport=page.getViewport({scale})
+const viewport=page.getViewport({scale:1.2})
 
 canvas.height=viewport.height
 canvas.width=viewport.width
@@ -494,6 +560,7 @@ pdfDoc.getDestination(item.dest)
 .then(index=>{
 
 pageNum=index+1
+
 renderPage(pageNum)
 
 })
