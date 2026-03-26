@@ -549,8 +549,6 @@ parentElement.appendChild(a);
 });
 } catch (error) {
 console.error(`Error loading PDFs for folder ${folder}:`, error);
-// 这里不隐藏主加载提示，因为 loadFolders 的 finally 会处理
-// 但可以考虑对单个文件夹加载失败进行提示
 }
 }
 
@@ -563,7 +561,7 @@ return;
 currentPdfUrl = url;
 
 document.getElementById("currentPDF").innerText = name.replace(/\.pdf$/, '');
-document.getElementById("toc").innerHTML = '<h3>PDF 目录</h3>'; // 清空并重置 TOC 内容
+document.getElementById("toc").innerHTML = '<h3>PDF 目录</h3>';
 
 pdfjsLib.getDocument(url).promise.then(pdf => {
 pdfDoc = pdf;
@@ -571,7 +569,6 @@ pageNum = 1;
 renderPage(pageNum);
 }).catch(error => {
 console.error("Error loading PDF:", error);
-// 弹窗显示更详细的错误信息
 let errorMessage = `加载 PDF "${name}" 失败: `;
 if (error instanceof Error) {
 errorMessage += error.message;
@@ -649,37 +646,56 @@ a.textContent = item.title;
 a.href = "#";
 a.onclick = (e) => {
 e.preventDefault();
-// 处理不同类型的目的地格式
-pdfDoc.getDestination(item.dest)
-.then(dest => {
-if (dest === null) {
-console.warn(`Destination for "${item.title}" is null. Cannot navigate.`);
-return Promise.reject("Destination is null");
+let destinationPromise;
+
+try {
+    // 尝试获取目的地，如果 item.dest 本身格式不正确，getDestination 可能会直接抛出错误
+    destinationPromise = pdfDoc.getDestination(item.dest);
+} catch (syncError) {
+    console.error(`Synchronous error getting destination for "${item.title}", item.dest:`, item.dest, syncError);
+    alert(`无法跳转到目录章节 "${item.title}"。原因: 目标链接格式错误 (${syncError.message || "未知错误"})`);
+    return; // 立即退出
 }
 
-let pageRef;
-// dest 可以是一个数组 [pageRef, ...] 或一个命名字符串
-if (Array.isArray(dest)) {
-pageRef = dest[0]; // 第一个元素通常是页面的 PDFRef
-} else if (typeof dest === 'string') {
-// 如果是命名目的地，pdf.js 会自动处理为正确的 PDFRef
-pageRef = dest;
-} else {
-console.warn(`Unsupported destination format for "${item.title}":`, dest);
-return Promise.reject("Unsupported destination format");
-}
+destinationPromise
+    .then(dest => {
+        if (dest === null) {
+            console.warn(`Destination for "${item.title}" is null. Cannot navigate.`);
+            return Promise.reject(new Error("Destination is null"));
+        }
 
-// getPageIndex 期望一个 PDFRef 或命名字符串
-return pdfDoc.getPageIndex(pageRef);
-})
-.then(index => {
-pageNum = index + 1; // 转换为基于1的页码
-renderPage(pageNum);
-})
-.catch(error => {
-console.error(`Error navigating to "${item.title}":`, error);
-alert(`无法跳转到目录章节 "${item.title}"。原因: ${error.message || "未知错误"}`);
-});
+        let pageRefOrNum;
+        // dest 可以是一个数组 [pageRef, ...] 或一个命名字符串
+        if (Array.isArray(dest)) {
+            pageRefOrNum = dest[0]; // 第一个元素通常是页面的 PDFRef
+        } else if (typeof dest === 'string') {
+            // 如果是命名目的地，pdf.js 会自动处理为正确的 PDFRef
+            pageRefOrNum = dest;
+        } else {
+            console.warn(`Unsupported destination format for "${item.title}":`, dest);
+            return Promise.reject(new Error("Unsupported destination format"));
+        }
+
+        // --- 核心修改：处理 pageRefOrNum 可能是页码数字的情况 ---
+        if (typeof pageRefOrNum === 'number') {
+            // 如果 dest[0] 直接是页码，pdf.js 的 getPageIndex() 不接受数字页码
+            // 我们可以直接使用这个数字作为目标页码
+            return Promise.resolve(pageRefOrNum - 1); // 转换为基于0的索引
+        } else if (pageRefOrNum === null || pageRefOrNum === undefined) {
+            console.warn(`Invalid page reference for "${item.title}". Value:`, pageRefOrNum);
+            return Promise.reject(new Error("Invalid page reference in destination"));
+        }
+        // 如果 pageRefOrNum 是 PDFRef 或命名字符串，getPageIndex() 可以处理
+        return pdfDoc.getPageIndex(pageRefOrNum);
+    })
+    .then(index => {
+        pageNum = index + 1; // 转换为基于1的页码
+        renderPage(pageNum);
+    })
+    .catch(error => {
+        console.error(`Error navigating to "${item.title}":`, error);
+        alert(`无法跳转到目录章节 "${item.title}"。原因: ${error.message || "未知错误"}`);
+    });
 };
 parent.appendChild(a);
 
@@ -710,8 +726,6 @@ tocLinks.forEach(link => link.classList.remove("active-link"));
 
 if (!pdfDoc) return;
 
-// We need a robust way to map outline items to page numbers
-// Cache results if possible to avoid re-calculating on every page render
 if (!pdfDoc._outlinePageMap) {
 pdfDoc._outlinePageMap = new Map();
 }
@@ -736,18 +750,25 @@ return pdfDoc.getDestination(item.dest)
 .then(dest => {
 if (dest === null) return null;
 
-let pageRef;
+let pageRefOrNum;
 if (Array.isArray(dest)) {
-pageRef = dest[0];
+pageRefOrNum = dest[0];
 } else if (typeof dest === 'string') {
-pageRef = dest;
+pageRefOrNum = dest;
 } else {
 return null;
 }
-return pdfDoc.getPageIndex(pageRef)
+
+if (typeof pageRefOrNum === 'number') {
+    return Promise.resolve({ item, pageIndex: pageRefOrNum }); // 如果是数字，直接用作页码
+} else if (pageRefOrNum === null || pageRefOrNum === undefined) {
+    return null;
+}
+
+return pdfDoc.getPageIndex(pageRefOrNum)
 .then(index => {
 const pageNum = index + 1;
-pdfDoc._outlinePageMap.set(item, pageNum); // Cache the result
+pdfDoc._outlinePageMap.set(item, pageNum);
 return { item, pageIndex: pageNum };
 })
 .catch(() => null);
@@ -762,7 +783,6 @@ let minDistance = Infinity;
 results.forEach(result => {
 if (result && result.pageIndex <= currentPage) {
 const distance = currentPage - result.pageIndex;
-// Prioritize closer links, then links that appeared earlier in the outline (smaller index in flatOutline)
 if (distance < minDistance || (distance === minDistance && flatOutline.indexOf(result.item) < flatOutline.indexOf(closestLink))) {
 minDistance = distance;
 closestLink = result.item;
