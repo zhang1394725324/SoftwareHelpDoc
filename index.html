@@ -166,18 +166,6 @@ display: flex; /* 使用 flex 布局 */
 flex-direction: column; /* 垂直方向布局 */
 }
 
-.viewer.sidebar-visible-0 {
-margin-left: 0;
-}
-
-.viewer.sidebar-visible-1 {
-margin-left: 260px;
-}
-
-.viewer.sidebar-visible-2 {
-margin-left: 520px;
-}
-
 /* 顶部翻页工具栏 */
 .pageHeaderToolbar {
 height: 40px;
@@ -296,11 +284,54 @@ font-size: 1.1em;
 color: #333;
 }
 
+/* 加载提示 */
+.loading-overlay {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0, 0, 0, 0.7);
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+color: white;
+font-size: 1.5em;
+z-index: 200; /* 确保在所有内容之上 */
+transition: opacity 0.3s ease-in-out;
+}
+
+.loading-overlay.hidden {
+opacity: 0;
+pointer-events: none; /* 隐藏后不允许点击 */
+}
+
+.spinner {
+border: 8px solid rgba(255, 255, 255, 0.3);
+border-top: 8px solid #1f6feb;
+border-radius: 50%;
+width: 60px;
+height: 60px;
+animation: spin 1s linear infinite;
+margin-bottom: 20px;
+}
+
+@keyframes spin {
+0% { transform: rotate(0deg); }
+100% { transform: rotate(360deg); }
+}
+
 </style>
 
 </head>
 
 <body>
+
+<div class="loading-overlay" id="loadingOverlay">
+<div class="spinner"></div>
+<p>加载中，请稍候...</p>
+</div>
 
 <div class="header">
 <div class="menuBtn" onclick="toggleSidebar('sidebar')" id="btnSidebar">
@@ -312,7 +343,7 @@ color: #333;
 软件目录
 </div>
 
-<div class="menuBtn" onclick="toggleSidebar('tocPanel')" id="btnToc">
+<div class="menuBtn" onclick="toggleToc()" id="btnToc">
 <div class="hamburger">
 <span></span>
 <span></span>
@@ -394,8 +425,8 @@ margin += tocPanelElement.offsetWidth;
 
 // 更新 viewer 的 margin-left
 viewerElement.style.marginLeft = `${margin}px`;
-// 更新左侧翻页按钮的位置
-leftArrowElement.style.left = `${margin + 20}px`; // 加上一些内边距
+// 更新左侧翻页按钮的位置，加上一些内边距
+leftArrowElement.style.left = `${margin + 20}px`;
 }
 
 function toggleSidebar(panelId) {
@@ -409,14 +440,20 @@ sidebarStates[panelId] = !panel.classList.contains("hidden"); // 更新状态
 updateViewerMargin(); // 更新阅读器边距
 }
 
-// 初始加载时隐藏所有侧边栏
-document.addEventListener('DOMContentLoaded', () => {
-document.getElementById("sidebar").classList.add("hidden");
-document.getElementById("tocPanel").classList.add("hidden");
-document.getElementById("btnSidebar").classList.remove("active");
-document.getElementById("btnToc").classList.remove("active");
-updateViewerMargin(); // 初始更新边距
-});
+// PDF 目录的切换逻辑独立出来
+function toggleToc() {
+const tocPanel = document.getElementById("tocPanel");
+const btnToc = document.getElementById("btnToc");
+
+if (tocPanel.classList.contains("hidden")) {
+// 如果目录当前是隐藏的，尝试加载并显示
+if (pdfDoc && document.getElementById("toc").innerHTML.trim() === '<h3>PDF 目录</h3>') {
+// 如果 pdfDoc 已加载但 toc 面板内容为空（除了标题），则重新加载目录
+loadTOC();
+}
+}
+toggleSidebar('tocPanel'); // 调用通用的切换侧边栏函数
+}
 
 
 /* 自动扫描 */
@@ -436,6 +473,7 @@ softwareList.appendChild(title);
 await loadPDFs(folder.name, softwareList); // 等待 PDF 加载完成
 }
 }
+hideLoadingOverlay(); // 所有文件夹和PDF加载完成后隐藏加载提示
 }
 
 async function loadPDFs(folder, parentElement) {
@@ -474,12 +512,14 @@ return; // 如果是同一个 PDF，则不重新加载
 currentPdfUrl = url;
 
 document.getElementById("currentPDF").innerText = name.replace(/\.pdf$/, '');
+document.getElementById("toc").innerHTML = '<h3>PDF 目录</h3>'; // 清空并重置 TOC 内容
 
 pdfjsLib.getDocument(url).promise.then(pdf => {
 pdfDoc = pdf;
 pageNum = 1;
 renderPage(pageNum);
-loadTOC();
+// 不再此处直接加载 TOC，而是等到用户点击“目录”按钮时再加载
+// loadTOC();
 }).catch(error => {
 console.error("Error loading PDF:", error);
 alert("加载 PDF 失败，请稍后再试。");
@@ -539,16 +579,14 @@ renderPage(pageNum);
 
 /* 目录 */
 function loadTOC() {
-if (!pdfDoc) return;
+if (!pdfDoc) {
+document.getElementById("toc").innerHTML = '<h3>PDF 目录</h3><p style="padding: 10px 15px; color: #666;">请先选择一个 PDF 文件。</p>';
+return;
+}
 
 pdfDoc.getOutline().then(outline => {
 const toc = document.getElementById("toc");
-toc.innerHTML = ""; // 清空之前的目录
-
-// 添加一个标题
-const tocTitle = document.createElement("h3");
-tocTitle.textContent = "PDF 目录";
-toc.appendChild(tocTitle);
+toc.innerHTML = "<h3>PDF 目录</h3>"; // 清空之前的目录并添加标题
 
 function create(item, parent) {
 const a = document.createElement("a");
@@ -583,10 +621,16 @@ parent.appendChild(subItems);
 }
 }
 
+if (outline && outline.length > 0) {
 outline.forEach(i => create(i, toc));
+} else {
+toc.innerHTML += '<p style="padding: 10px 15px; color: #666;">此 PDF 没有目录。</p>';
+}
+
 
 }).catch(error => {
 console.error("Error loading TOC:", error);
+document.getElementById("toc").innerHTML = '<h3>PDF 目录</h3><p style="padding: 10px 15px; color: #666;">加载目录失败。</p>';
 });
 }
 
@@ -604,6 +648,7 @@ let minDistance = Infinity;
 pdfDoc.getOutline().then(outline => {
 const flatOutline = [];
 function flattenOutline(items) {
+if (!items) return;
 items.forEach(item => {
 flatOutline.push(item);
 if (item.items) flattenOutline(item.items);
@@ -661,7 +706,33 @@ a.textContent.toLowerCase().includes(q)
 });
 }
 
-loadFolders();
+// 加载提示相关函数
+function showLoadingOverlay(message = "加载中，请稍候...") {
+const overlay = document.getElementById("loadingOverlay");
+overlay.querySelector("p").textContent = message;
+overlay.classList.remove("hidden");
+}
+
+function hideLoadingOverlay() {
+const overlay = document.getElementById("loadingOverlay");
+overlay.classList.add("hidden");
+}
+
+
+// 初始加载
+document.addEventListener('DOMContentLoaded', () => {
+showLoadingOverlay("正在加载软件列表..."); // 页面加载时显示加载提示
+document.getElementById("sidebar").classList.add("hidden"); // 软件目录默认隐藏
+document.getElementById("tocPanel").classList.add("hidden"); // PDF目录默认隐藏
+document.getElementById("btnSidebar").classList.remove("active");
+document.getElementById("btnToc").classList.remove("active");
+
+// 初始化 PDF 目录内容，避免空白
+document.getElementById("toc").innerHTML = '<h3>PDF 目录</h3>';
+
+updateViewerMargin(); // 初始更新边距
+loadFolders(); // 开始加载软件列表
+});
 
 </script>
 
