@@ -1,189 +1,431 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>软件帮助中心 - 自动化版本</title>
+
+<title>软件帮助中心</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
 <style>
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;background:#f4f5f7;overflow:hidden;}
-.header{height:55px;background:#0d1117;color:white;display:flex;align-items:center;padding:0 20px;font-size:18px;font-weight:500;box-shadow:0 2px 10px rgba(0,0,0,0.3);}
-.container{display:flex;height:calc(100vh - 55px);}
-.sidebar{width:220px;background:#fff;border-right:1px solid #ddd;overflow:auto;padding:10px 10px;}
-#searchBox{width:100%;padding:5px 8px;margin-bottom:8px;border:1px solid #ccc;border-radius:5px;font-size:13px;}
-.sidebar h3{font-size:14px;margin-top:10px;margin-bottom:5px;color:#444;}
-.sidebar a{display:block;padding:5px 8px;text-decoration:none;color:#333;border-radius:5px;font-size:13px;cursor:pointer;transition:0.2s;}
-.sidebar a:hover{background:#f1f3f5;}
-.toc{width:260px;background:#fafafa;border-right:1px solid #ddd;overflow:auto;padding:10px 10px;}
-.toc h3{margin-top:0;}
-.toc a{display:block;padding:5px 5px 5px 10px;font-size:13px;cursor:pointer;border-radius:5px;margin-bottom:2px;transition:0.2s;}
-.toc a:hover{background:#e2e2e2;}
-.toc .folder::before{content:'▶';display:inline-block;width:12px;transition:0.2s;margin-right:5px;}
-.toc .folder.expanded::before{transform:rotate(90deg);}
-.toc .nested{display:none;padding-left:18px;}
-.toc .nested a{font-size:12.5px;}
-.viewer{flex:1;background:#525659;overflow:auto;text-align:center;display:flex;flex-direction:column;align-items:center;}
-.toolbar{width:100%;background:white;padding:8px 10px;display:flex;align-items:center;box-shadow:0 2px 5px rgba(0,0,0,0.1);z-index:10;}
-button{margin-right:10px;padding:5px 12px;border-radius:5px;border:1px solid #ccc;background:white;cursor:pointer;transition:0.2s;}
-button:hover{background:#f1f1f1;}
-#pageInfo{font-size:13px;color:#333;}
-canvas{margin:10px auto;box-shadow:0 5px 20px rgba(0,0,0,0.3);}
+
+body{
+margin:0;
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
+background:#f5f6fa;
+overflow:hidden;
+}
+
+/* 顶部栏 */
+
+.header{
+height:50px;
+background:#0d1117;
+color:white;
+display:flex;
+align-items:center;
+padding:0 15px;
+font-size:16px;
+}
+
+.header button{
+margin-left:10px;
+}
+
+/* 主体 */
+
+.container{
+display:flex;
+height:calc(100vh - 50px);
+}
+
+/* 左侧软件栏 */
+
+.sidebar{
+width:240px;
+background:white;
+border-right:1px solid #ddd;
+overflow:auto;
+transition:0.3s;
+}
+
+.sidebar.hidden{
+width:0;
+overflow:hidden;
+}
+
+/* 目录 */
+
+.toc{
+width:260px;
+background:#fafafa;
+border-right:1px solid #ddd;
+overflow:auto;
+transition:0.3s;
+}
+
+.toc.hidden{
+width:0;
+overflow:hidden;
+}
+
+/* PDF区域 */
+
+.viewer{
+flex:1;
+background:#525659;
+overflow:auto;
+position:relative;
+text-align:center;
+}
+
+/* 加载动画 */
+
+.loading{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+color:white;
+font-size:18px;
+display:none;
+}
+
+/* 高亮 */
+
+.active{
+background:#e6f3ff !important;
+border-left:3px solid #0078ff;
+}
+
+/* 搜索 */
+
+.search{
+width:90%;
+margin:10px;
+padding:6px;
+border:1px solid #ccc;
+border-radius:5px;
+}
+
+/* 目录 */
+
+.toc a{
+display:block;
+padding:5px 10px;
+cursor:pointer;
+font-size:13px;
+}
+
+.toc a:hover{
+background:#eee;
+}
+
+canvas{
+margin:10px auto;
+box-shadow:0 5px 20px rgba(0,0,0,0.3);
+}
+
+.toolbar{
+background:white;
+padding:5px;
+}
+
 </style>
+
 </head>
+
 <body>
 
-<div class="header">📘 软件帮助中心（自动化版本）</div>
+<div class="header">
+
+软件帮助中心
+
+<button onclick="toggleSidebar()">软件</button>
+<button onclick="toggleToc()">目录</button>
+
+</div>
 
 <div class="container">
 
 <div class="sidebar">
-<input type="text" id="searchBox" placeholder="搜索软件或PDF">
+
+<input id="searchBox" class="search" placeholder="搜索软件/章节">
+
 <div id="softwareList"></div>
+
 </div>
 
 <div class="toc">
-<h3>目录</h3>
+
 <div id="toc"></div>
+
 </div>
 
 <div class="viewer">
+
 <div class="toolbar">
+
 <button onclick="prevPage()">上一页</button>
 <button onclick="nextPage()">下一页</button>
+
 <span id="pageInfo"></span>
+
 </div>
+
+<div class="loading" id="loading">
+PDF加载中...
+</div>
+
 <canvas id="pdfCanvas"></canvas>
+
+</div>
+
 </div>
 
 <script>
-// ----------------------------
-// GitHub 仓库信息
-// ----------------------------
-const owner = "zhang1394725324";
-const repo = "SoftwareHelpDoc";
-const branch = "main"; // 根据你仓库的默认分支修改
 
-const softwareList = document.getElementById("softwareList");
-let allLinks = [];
-let pdfDoc=null, pageNum=1, scale=1.2;
+const owner="zhang1394725324"
+const repo="SoftwareHelpDoc"
+const branch="main"
 
-// ----------------------------
-// PDF.js 初始化
-// ----------------------------
-pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+let pdfDoc=null
+let pageNum=1
+let outlineData=[]
+let scale=1.2
 
-// ----------------------------
-// 自动获取仓库文件夹和 PDF
-// ----------------------------
+pdfjsLib.GlobalWorkerOptions.workerSrc=
+'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
+
+/* UI控制 */
+
+function toggleSidebar(){
+document.querySelector(".sidebar").classList.toggle("hidden")
+}
+
+function toggleToc(){
+document.querySelector(".toc").classList.toggle("hidden")
+}
+
+/* 加载动画 */
+
+function showLoading(){
+document.getElementById("loading").style.display="block"
+}
+
+function hideLoading(){
+document.getElementById("loading").style.display="none"
+}
+
+/* 自动扫描 */
+
 async function loadFolders(){
-  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/?ref=${branch}`);
-  const data = await res.json();
-  for(const item of data){
-    if(item.type === "dir"){
-      loadPDFs(item.name);
-    }
-  }
+
+showLoading()
+
+const res=await fetch(
+`https://api.github.com/repos/${owner}/${repo}/contents/?ref=${branch}`
+)
+
+const data=await res.json()
+
+const list=document.getElementById("softwareList")
+
+data.forEach(folder=>{
+
+if(folder.type=="dir"){
+
+loadPDFs(folder.name)
+
+}
+
+})
+
+hideLoading()
+
 }
 
 async function loadPDFs(folder){
-  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${folder}?ref=${branch}`);
-  const files = await res.json();
-  if(!files || files.length===0) return;
 
-  const title = document.createElement("h3");
-  title.textContent = folder;
-  softwareList.appendChild(title);
+const res=await fetch(
+`https://api.github.com/repos/${owner}/${repo}/contents/${folder}?ref=${branch}`
+)
 
-  files.forEach(file=>{
-    if(file.name.endsWith(".pdf")){
-      const link = document.createElement("a");
-      link.textContent = file.name;
-      link.dataset.url = file.download_url;
-      link.onclick = ()=>loadPDF(file.download_url);
-      softwareList.appendChild(link);
-      allLinks.push({name:file.name,url:file.download_url});
-    }
-  });
+const files=await res.json()
+
+const list=document.getElementById("softwareList")
+
+const title=document.createElement("h3")
+title.textContent=folder
+
+list.appendChild(title)
+
+files.forEach(file=>{
+
+if(file.name.endsWith(".pdf")){
+
+const link=document.createElement("a")
+
+link.textContent=file.name
+
+link.onclick=()=>loadPDF(file.download_url,link)
+
+list.appendChild(link)
+
 }
 
-// ----------------------------
-// 加载 PDF 和渲染
-// ----------------------------
-function loadPDF(url){
-  pdfjsLib.getDocument(url).promise.then(pdf=>{
-    pdfDoc=pdf;
-    pageNum=1;
-    renderPage(pageNum);
-    loadTOC();
-  });
+})
+
 }
+
+/* 加载PDF */
+
+function loadPDF(url,link){
+
+showLoading()
+
+document.querySelectorAll(".sidebar a")
+.forEach(a=>a.classList.remove("active"))
+
+link.classList.add("active")
+
+pdfjsLib.getDocument(url).promise.then(pdf=>{
+
+pdfDoc=pdf
+pageNum=1
+
+renderPage(pageNum)
+
+loadTOC()
+
+hideLoading()
+
+})
+
+}
+
+/* 渲染 */
 
 function renderPage(num){
-  pdfDoc.getPage(num).then(page=>{
-    const canvas=document.getElementById("pdfCanvas");
-    const ctx=canvas.getContext("2d");
-    const viewport=page.getViewport({scale});
-    canvas.height=viewport.height;
-    canvas.width=viewport.width;
-    page.render({canvasContext:ctx,viewport});
-    document.getElementById("pageInfo").innerText=`第 ${num} 页 / ${pdfDoc.numPages}`;
-  });
+
+pdfDoc.getPage(num).then(page=>{
+
+const canvas=document.getElementById("pdfCanvas")
+
+const ctx=canvas.getContext("2d")
+
+const viewport=page.getViewport({scale})
+
+canvas.height=viewport.height
+canvas.width=viewport.width
+
+page.render({
+canvasContext:ctx,
+viewport:viewport
+})
+
+document.getElementById("pageInfo")
+.innerText=`第 ${num} 页 / ${pdfDoc.numPages}`
+
+})
+
 }
 
-function prevPage(){ if(pageNum<=1) return; pageNum--; renderPage(pageNum); }
-function nextPage(){ if(pageNum>=pdfDoc.numPages) return; pageNum++; renderPage(pageNum); }
+/* 翻页 */
 
-// ----------------------------
-// 多级目录折叠
-// ----------------------------
+function prevPage(){
+if(pageNum<=1)return
+pageNum--
+renderPage(pageNum)
+}
+
+function nextPage(){
+if(pageNum>=pdfDoc.numPages)return
+pageNum++
+renderPage(pageNum)
+}
+
+/* 目录 */
+
 function loadTOC(){
-  pdfDoc.getOutline().then(outline=>{
-    const toc=document.getElementById("toc");
-    toc.innerHTML="";
-    if(!outline) return;
-    outline.forEach(item=>createTOCItem(toc,item));
-  });
+
+pdfDoc.getOutline().then(outline=>{
+
+outlineData=[]
+
+const toc=document.getElementById("toc")
+
+toc.innerHTML=""
+
+function create(item,parent){
+
+const a=document.createElement("a")
+
+a.textContent=item.title
+
+a.onclick=()=>{
+
+pdfDoc.getDestination(item.dest)
+.then(dest=>pdfDoc.getPageIndex(dest[0]))
+.then(index=>{
+
+pageNum=index+1
+renderPage(pageNum)
+
+})
+
 }
 
-function createTOCItem(parent,item){
-  const a=document.createElement("a");
-  a.textContent=item.title;
-  if(item.items && item.items.length>0){
-    a.classList.add("folder");
-    const nested=document.createElement("div");
-    nested.classList.add("nested");
-    item.items.forEach(sub=>createTOCItem(nested,sub));
-    a.onclick=()=>nested.style.display=(nested.style.display==="block"?"none":"block");
-    parent.appendChild(a);
-    parent.appendChild(nested);
-  } else {
-    a.onclick=()=>{
-      pdfDoc.getDestination(item.dest)
-      .then(dest=> pdfDoc.getPageIndex(dest[0]))
-      .then(index=>{ pageNum=index+1; renderPage(pageNum); });
-    };
-    parent.appendChild(a);
-  }
+parent.appendChild(a)
+
+outlineData.push(a)
+
+if(item.items){
+
+item.items.forEach(i=>create(i,parent))
+
 }
 
-// ----------------------------
-// 搜索功能
-// ----------------------------
-document.getElementById("searchBox").addEventListener("input", e=>{
-  const q = e.target.value.toLowerCase();
-  const links = document.querySelectorAll(".sidebar a");
-  links.forEach(link=>{
-    link.style.display = link.textContent.toLowerCase().includes(q)?"block":"none";
-  });
-});
+}
 
-// ----------------------------
-// 初始化
-// ----------------------------
-loadFolders();
+outline.forEach(i=>create(i,toc))
+
+})
+
+}
+
+/* 搜索 */
+
+document.getElementById("searchBox")
+.addEventListener("input",function(){
+
+const q=this.value.toLowerCase()
+
+document.querySelectorAll(".sidebar a")
+.forEach(a=>{
+
+a.style.display=
+a.textContent.toLowerCase().includes(q)
+?"block":"none"
+
+})
+
+outlineData.forEach(a=>{
+
+a.style.display=
+a.textContent.toLowerCase().includes(q)
+?"block":"none"
+
+})
+
+})
+
+loadFolders()
+
 </script>
 
 </body>
+
 </html>
