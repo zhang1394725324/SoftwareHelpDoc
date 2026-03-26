@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 
 <head>
 
@@ -9,260 +9,291 @@
 <title>软件帮助中心</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<!-- 引入 Font Awesome 图标库 -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <style>
 
-body{
-margin:0;
-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
-overflow:hidden;
-background:#f5f6fa;
+body {
+margin: 0;
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+background: #f5f6fa;
+overflow: hidden;
 }
 
 /* 顶部 */
-
-.header{
-
-height:55px;
-background:#0d1117;
-color:white;
-display:flex;
-align-items:center;
-padding:0 15px;
-gap:15px;
-
+.header {
+height: 55px;
+background: #0d1117;
+color: white;
+display: flex;
+align-items: center;
+padding: 0 15px;
+gap: 15px;
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+z-index: 100; /* 确保顶部栏在最上层 */
+position: relative;
 }
 
-/* 三条杠按钮 */
-
-.menuBtn{
-
-display:flex;
-align-items:center;
-gap:6px;
-cursor:pointer;
-padding:6px 12px;
-border-radius:6px;
-transition:.2s;
-
+.menuBtn {
+display: flex;
+align-items: center;
+gap: 6px;
+cursor: pointer;
+padding: 6px 10px;
+border-radius: 6px;
+transition: background 0.2s ease-in-out;
 }
 
-.menuBtn:hover{
-
-background:#30363d;
-
+.menuBtn:hover {
+background: #30363d;
 }
 
-.menuBtn.active{
-
-background:#1f6feb;
-
+.menuBtn.active {
+background: #1f6feb;
 }
 
-.hamburger span{
-
-display:block;
-width:16px;
-height:2px;
-background:white;
-margin:3px 0;
-
+/* 三条杠 */
+.hamburger span {
+display: block;
+width: 16px;
+height: 2px;
+background: white;
+margin: 3px 0;
 }
 
 /* 当前PDF */
-
-.currentPDF{
-
-flex:1;
-text-align:center;
-font-weight:600;
-
+.currentPDF {
+flex: 1;
+text-align: center;
+font-weight: 600;
+font-size: 1.1em;
+white-space: nowrap; /* 防止标题换行 */
+overflow: hidden; /* 隐藏溢出内容 */
+text-overflow: ellipsis; /* 显示省略号 */
+max-width: 300px; /* 限制标题最大宽度 */
 }
 
 /* 搜索 */
-
-.searchBox{
-
-display:flex;
-align-items:center;
-gap:6px;
-
+.searchBox {
+display: flex;
+gap: 5px;
+align-items: center;
 }
 
-.searchBox input{
-
-padding:6px;
-border-radius:4px;
-border:none;
-width:180px;
-
+.searchBox input {
+padding: 7px 10px;
+border-radius: 4px;
+border: 1px solid #ccc;
+outline: none;
+font-size: 0.9em;
+width: 150px;
+transition: border-color 0.2s ease-in-out;
 }
 
-.searchBtn{
-
-display:flex;
-align-items:center;
-gap:4px;
-padding:6px 10px;
-cursor:pointer;
-border-radius:5px;
-background:#30363d;
+.searchBox input:focus {
+border-color: #1f6feb;
 }
 
-.searchBtn:hover{
-
-background:#1f6feb;
-
+.searchBox button {
+padding: 7px 12px;
+cursor: pointer;
+background: #1f6feb;
+color: white;
+border: none;
+border-radius: 4px;
+font-size: 0.9em;
+display: flex;
+align-items: center;
+gap: 5px;
+transition: background 0.2s ease-in-out;
 }
 
-/* 侧边栏 */
-
-.sidebar{
-
-position:fixed;
-top:55px;
-bottom:0;
-width:260px;
-background:white;
-overflow:auto;
-border-right:1px solid #ddd;
-transition:.3s;
-
+.searchBox button:hover {
+background: #195ac8;
 }
 
-#sidebar{
-
-left:0;
-
+/* 侧边栏容器 */
+.sidebar-container {
+display: flex;
+position: fixed;
+top: 55px;
+left: 0;
+bottom: 0;
+z-index: 90; /* 确保侧边栏在顶部栏下方，但在阅读器上方 */
 }
 
-#tocPanel{
-
-left:260px;
-
+/* 左侧软件目录 */
+.sidebar {
+width: 260px;
+background: white;
+border-right: 1px solid #ddd;
+overflow-y: auto;
+transition: transform 0.3s ease-in-out;
+flex-shrink: 0; /* 防止侧边栏被压缩 */
 }
 
-/* 隐藏 */
-
-.sidebar.hidden{
-
-transform:translateX(-260px);
-
+.sidebar.hidden {
+transform: translateX(-100%); /* 完全隐藏 */
 }
 
-/* PDF区 */
-
-.viewer{
-
-position:fixed;
-top:55px;
-right:0;
-bottom:0;
-left:520px;
-background:#525659;
-overflow:auto;
-text-align:center;
-transition:.3s;
-
+/* PDF 目录 */
+.toc {
+width: 260px;
+background: #fafafa;
+border-right: 1px solid #ddd;
+overflow-y: auto;
+transition: transform 0.3s ease-in-out;
+flex-shrink: 0; /* 防止侧边栏被压缩 */
 }
 
-/* 响应 */
-
-.viewer.full1{
-
-left:260px;
-
+.toc.hidden {
+transform: translateX(-100%); /* 完全隐藏 */
 }
 
-.viewer.full2{
-
-left:0;
-
+/* 阅读区 */
+.viewer {
+position: fixed;
+top: 55px;
+left: 0;
+right: 0;
+bottom: 0;
+background: #525659;
+text-align: center;
+overflow-y: auto;
+transition: margin-left 0.3s ease-in-out;
+display: flex; /* 使用 flex 布局 */
+flex-direction: column; /* 垂直方向布局 */
 }
 
-/* PDF */
-
-canvas{
-
-margin:20px auto;
-box-shadow:0 5px 20px rgba(0,0,0,.4);
-
+.viewer.sidebar-visible-0 {
+margin-left: 0;
 }
 
-/* 翻页箭头 */
-
-.pageArrow{
-
-position:fixed;
-top:50%;
-transform:translateY(-50%);
-width:45px;
-height:70px;
-background:rgba(0,0,0,.3);
-color:white;
-font-size:28px;
-display:flex;
-align-items:center;
-justify-content:center;
-cursor:pointer;
-border-radius:6px;
-
+.viewer.sidebar-visible-1 {
+margin-left: 260px;
 }
 
-.leftArrow{
-
-left:540px;
-
+.viewer.sidebar-visible-2 {
+margin-left: 520px;
 }
 
-.rightArrow{
-
-right:20px;
-
+/* 顶部翻页工具栏 */
+.pageHeaderToolbar {
+height: 40px;
+background: #333;
+color: white;
+display: flex;
+align-items: center;
+justify-content: center; /* 居中显示 */
+gap: 20px;
+padding: 0 15px;
+flex-shrink: 0; /* 防止被压缩 */
 }
 
-/* 底部工具栏 */
-
-.pageToolbar{
-
-position:fixed;
-bottom:15px;
-left:50%;
-transform:translateX(-50%);
-background:rgba(0,0,0,.5);
-color:white;
-padding:8px 15px;
-border-radius:8px;
-display:flex;
-gap:15px;
-align-items:center;
-
+.pageHeaderToolbar button {
+padding: 5px 12px;
+cursor: pointer;
+background: #1f6feb;
+color: white;
+border: none;
+border-radius: 4px;
+font-size: 0.9em;
+transition: background 0.2s ease-in-out;
 }
 
-button{
-
-cursor:pointer;
-
+.pageHeaderToolbar button:hover {
+background: #195ac8;
 }
 
-a{
-
-display:block;
-padding:6px 10px;
-cursor:pointer;
-
+.pageHeaderToolbar span {
+font-size: 1em;
+font-weight: 500;
 }
 
-a:hover{
-
-background:#eee;
-
+/* PDF Canvas 容器 */
+.canvas-container {
+flex-grow: 1; /* 占据剩余空间 */
+display: flex;
+justify-content: center;
+align-items: flex-start; /* 将 canvas 顶部对齐 */
+padding-top: 20px; /* 顶部内边距 */
+padding-bottom: 20px; /* 底部内边距 */
 }
 
-.active{
+canvas {
+box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
+background: white; /* 确保 canvas 背景是白色 */
+}
 
-background:#e6f3ff;
+/* 翻页按钮 */
+.pageArrow {
+position: fixed;
+top: 50%;
+transform: translateY(-50%);
+width: 50px;
+height: 80px;
+background: rgba(0, 0, 0, 0.3);
+color: white;
+font-size: 28px;
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+border-radius: 6px;
+z-index: 99; /* 确保在阅读器上方 */
+transition: background 0.2s ease-in-out;
+}
 
+.pageArrow:hover {
+background: rgba(0, 0, 0, 0.5);
+}
+
+.leftArrow {
+left: var(--viewer-left-margin, 0); /* 使用 CSS 变量控制位置 */
+}
+
+.rightArrow {
+right: 20px;
+}
+
+/* 侧边栏内容样式 */
+#softwareList h3 {
+padding: 10px 15px;
+margin: 0;
+background: #f0f2f5;
+border-bottom: 1px solid #eee;
+font-size: 1.1em;
+color: #333;
+}
+
+#softwareList a, #toc a {
+display: block;
+padding: 10px 15px;
+cursor: pointer;
+color: #333;
+text-decoration: none;
+border-bottom: 1px solid #eee;
+transition: background 0.2s ease-in-out;
+}
+
+#softwareList a:hover, #toc a:hover {
+background: #e6f3ff;
+}
+
+#softwareList a.active-link, #toc a.active-link {
+background: #e6f3ff;
+font-weight: 600;
+color: #1f6feb;
+}
+
+#toc h3 {
+padding: 10px 15px;
+margin: 0;
+background: #f0f2f5;
+border-bottom: 1px solid #eee;
+font-size: 1.1em;
+color: #333;
 }
 
 </style>
@@ -272,336 +303,365 @@ background:#e6f3ff;
 <body>
 
 <div class="header">
-
-<div class="menuBtn" onclick="toggleSidebar()" id="btnSidebar">
-
+<div class="menuBtn" onclick="toggleSidebar('sidebar')" id="btnSidebar">
 <div class="hamburger">
 <span></span>
 <span></span>
 <span></span>
 </div>
-
 软件目录
-
 </div>
 
-<div class="menuBtn" onclick="toggleToc()" id="btnToc">
-
+<div class="menuBtn" onclick="toggleSidebar('tocPanel')" id="btnToc">
 <div class="hamburger">
 <span></span>
 <span></span>
 <span></span>
 </div>
-
-PDF目录
-
+目录
 </div>
 
 <div class="currentPDF" id="currentPDF">
-
 软件帮助中心
-
 </div>
 
 <div class="searchBox">
-
 <input id="searchBox" placeholder="搜索章节">
-
-<div class="searchBtn" onclick="search()">
-
-🔍 搜索
-
+<button onclick="search()">
+<i class="fas fa-search"></i> 搜索
+</button>
+</div>
 </div>
 
-</div>
-
-</div>
-
+<!-- 侧边栏容器，包裹两个侧边栏 -->
+<div class="sidebar-container">
 <div class="sidebar" id="sidebar">
-
 <div id="softwareList"></div>
-
 </div>
 
-<div class="sidebar" id="tocPanel">
-
+<div class="toc" id="tocPanel">
 <div id="toc"></div>
-
+</div>
 </div>
 
-<div class="viewer" id="viewer">
 
+<div class="viewer" id="pdfViewer">
+<div class="pageHeaderToolbar">
+<button onclick="prevPage()"><i class="fas fa-arrow-left"></i> 上一页</button>
+<span id="pageInfo"></span>
+<button onclick="nextPage()">下一页 <i class="fas fa-arrow-right"></i></button>
+</div>
+<div class="canvas-container">
 <canvas id="pdfCanvas"></canvas>
-
+</div>
 </div>
 
 <div class="pageArrow leftArrow" onclick="prevPage()">‹</div>
 <div class="pageArrow rightArrow" onclick="nextPage()">›</div>
 
-<div class="pageToolbar">
-
-<button onclick="prevPage()">上一页</button>
-
-<span id="pageInfo">0 / 0</span>
-
-<button onclick="nextPage()">下一页</button>
-
-</div>
-
 <script>
 
-const owner="zhang1394725324"
-const repo="SoftwareHelpDoc"
+const owner = "zhang1394725324";
+const repo = "SoftwareHelpDoc";
 
-let pdfDoc=null
-let pageNum=1
+let pdfDoc = null;
+let pageNum = 1;
+let scale = 1.2;
+let currentPdfUrl = null; // 用于跟踪当前加载的 PDF URL
 
-let sidebarOpen=true
-let tocOpen=true
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-pdfjsLib.GlobalWorkerOptions.workerSrc=
-'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
+// 侧边栏状态管理
+let sidebarStates = {
+sidebar: false, // false 表示隐藏，true 表示显示
+tocPanel: false
+};
 
-function updateViewer(){
+function updateViewerMargin() {
+let margin = 0;
+const sidebarElement = document.getElementById("sidebar");
+const tocPanelElement = document.getElementById("tocPanel");
+const viewerElement = document.getElementById("pdfViewer");
+const leftArrowElement = document.querySelector(".leftArrow");
 
-const viewer=document.getElementById("viewer")
-
-if(sidebarOpen && tocOpen){
-
-viewer.className="viewer"
-
-}else if(sidebarOpen || tocOpen){
-
-viewer.className="viewer full1"
-
-}else{
-
-viewer.className="viewer full2"
-
+if (sidebarStates.sidebar) {
+margin += sidebarElement.offsetWidth;
+}
+if (sidebarStates.tocPanel) {
+margin += tocPanelElement.offsetWidth;
 }
 
+// 更新 viewer 的 margin-left
+viewerElement.style.marginLeft = `${margin}px`;
+// 更新左侧翻页按钮的位置
+leftArrowElement.style.left = `${margin + 20}px`; // 加上一些内边距
 }
 
-/* 软件目录 */
+function toggleSidebar(panelId) {
+const panel = document.getElementById(panelId);
+const btn = document.getElementById('btn' + (panelId === 'sidebar' ? 'Sidebar' : 'Toc'));
 
-function toggleSidebar(){
+panel.classList.toggle("hidden");
+btn.classList.toggle("active");
+sidebarStates[panelId] = !panel.classList.contains("hidden"); // 更新状态
 
-sidebarOpen=!sidebarOpen
-
-document.getElementById("sidebar")
-.classList.toggle("hidden")
-
-document.getElementById("btnSidebar")
-.classList.toggle("active")
-
-updateViewer()
-
+updateViewerMargin(); // 更新阅读器边距
 }
 
-/* PDF目录 */
+// 初始加载时隐藏所有侧边栏
+document.addEventListener('DOMContentLoaded', () => {
+document.getElementById("sidebar").classList.add("hidden");
+document.getElementById("tocPanel").classList.add("hidden");
+document.getElementById("btnSidebar").classList.remove("active");
+document.getElementById("btnToc").classList.remove("active");
+updateViewerMargin(); // 初始更新边距
+});
 
-function toggleToc(){
-
-tocOpen=!tocOpen
-
-document.getElementById("tocPanel")
-.classList.toggle("hidden")
-
-document.getElementById("btnToc")
-.classList.toggle("active")
-
-updateViewer()
-
-}
 
 /* 自动扫描 */
-
-async function loadFolders(){
-
-const res=await fetch(
+async function loadFolders() {
+const res = await fetch(
 `https://api.github.com/repos/${owner}/${repo}/contents`
-)
+);
+const data = await res.json();
+const softwareList = document.getElementById("softwareList");
+softwareList.innerHTML = ""; // 清空之前的列表
 
-const data=await res.json()
-
-data.forEach(folder=>{
-
-if(folder.type=="dir"){
-
-loadPDFs(folder.name)
-
+for (const folder of data) {
+if (folder.type == "dir") {
+const title = document.createElement("h3");
+title.textContent = folder.name;
+softwareList.appendChild(title);
+await loadPDFs(folder.name, softwareList); // 等待 PDF 加载完成
+}
+}
 }
 
-})
-
-}
-
-async function loadPDFs(folder){
-
-const res=await fetch(
+async function loadPDFs(folder, parentElement) {
+const res = await fetch(
 `https://api.github.com/repos/${owner}/${repo}/contents/${folder}`
-)
+);
+const files = await res.json();
 
-const files=await res.json()
-
-const list=document.getElementById("softwareList")
-
-const title=document.createElement("h3")
-title.textContent=folder
-
-list.appendChild(title)
-
-files.forEach(file=>{
-
-if(file.name.endsWith(".pdf")){
-
-const a=document.createElement("a")
-
-a.textContent=file.name
-
-a.onclick=()=>loadPDF(file.download_url,file.name)
-
-list.appendChild(a)
-
+files.forEach(file => {
+if (file.name.endsWith(".pdf")) {
+const a = document.createElement("a");
+a.textContent = file.name.replace(/\.pdf$/, ''); // 移除 .pdf 后缀
+a.href = "#"; // 阻止默认跳转
+a.dataset.pdfUrl = file.download_url; // 存储 PDF URL
+a.onclick = (e) => {
+e.preventDefault(); // 阻止默认行为
+// 移除所有 active 样式
+document.querySelectorAll("#softwareList a").forEach(link => {
+link.classList.remove("active-link");
+});
+// 添加当前点击的 active 样式
+e.target.classList.add("active-link");
+loadPDF(file.download_url, file.name);
+};
+parentElement.appendChild(a);
 }
-
-})
-
+});
 }
 
 /* 加载PDF */
+function loadPDF(url, name) {
+if (currentPdfUrl === url) {
+console.log("PDF already loaded:", url);
+return; // 如果是同一个 PDF，则不重新加载
+}
+currentPdfUrl = url;
 
-function loadPDF(url,name){
+document.getElementById("currentPDF").innerText = name.replace(/\.pdf$/, '');
 
-document.getElementById("currentPDF")
-.innerText=name
-
-pdfjsLib.getDocument(url).promise.then(pdf=>{
-
-pdfDoc=pdf
-pageNum=1
-
-renderPage(pageNum)
-loadTOC()
-
-})
-
+pdfjsLib.getDocument(url).promise.then(pdf => {
+pdfDoc = pdf;
+pageNum = 1;
+renderPage(pageNum);
+loadTOC();
+}).catch(error => {
+console.error("Error loading PDF:", error);
+alert("加载 PDF 失败，请稍后再试。");
+});
 }
 
-/* 渲染 */
+function renderPage(num) {
+if (!pdfDoc) return; // 确保 pdfDoc 已加载
 
-function renderPage(num){
+pdfDoc.getPage(num).then(page => {
+const canvas = document.getElementById("pdfCanvas");
+const ctx = canvas.getContext("2d");
 
-pdfDoc.getPage(num).then(page=>{
+const viewport = page.getViewport({ scale });
 
-const canvas=document.getElementById("pdfCanvas")
+// 自动调整 canvas 大小以适应页面
+const desiredWidth = document.querySelector('.canvas-container').offsetWidth * 0.9; // 90% 宽度
+const desiredScale = desiredWidth / viewport.width;
+const newViewport = page.getViewport({ scale: desiredScale });
 
-const ctx=canvas.getContext("2d")
 
-const viewport=page.getViewport({scale:1.2})
-
-canvas.height=viewport.height
-canvas.width=viewport.width
+canvas.height = newViewport.height;
+canvas.width = newViewport.width;
 
 page.render({
+canvasContext: ctx,
+viewport: newViewport
+});
 
-canvasContext:ctx,
-viewport
+document.getElementById("pageInfo").innerText = `${num} / ${pdfDoc.numPages}`;
 
-})
+// 滚动到 canvas 顶部
+document.querySelector('.canvas-container').scrollTo({
+top: 0,
+behavior: 'smooth'
+});
 
-document.getElementById("pageInfo")
-.innerText=`${num} / ${pdfDoc.numPages}`
+// 更新当前活跃的 TOC 链接
+updateActiveTocLink(num);
 
-})
-
+}).catch(error => {
+console.error("Error rendering page:", error);
+});
 }
 
-function prevPage(){
-
-if(pageNum<=1)return
-
-pageNum--
-
-renderPage(pageNum)
-
+function prevPage() {
+if (pageNum <= 1) return;
+pageNum--;
+renderPage(pageNum);
 }
 
-function nextPage(){
-
-if(pageNum>=pdfDoc.numPages)return
-
-pageNum++
-
-renderPage(pageNum)
-
+function nextPage() {
+if (pageNum >= pdfDoc.numPages) return;
+pageNum++;
+renderPage(pageNum);
 }
 
 /* 目录 */
+function loadTOC() {
+if (!pdfDoc) return;
 
-function loadTOC(){
+pdfDoc.getOutline().then(outline => {
+const toc = document.getElementById("toc");
+toc.innerHTML = ""; // 清空之前的目录
 
-pdfDoc.getOutline().then(outline=>{
+// 添加一个标题
+const tocTitle = document.createElement("h3");
+tocTitle.textContent = "PDF 目录";
+toc.appendChild(tocTitle);
 
-const toc=document.getElementById("toc")
-
-toc.innerHTML=""
-
-function create(item,parent){
-
-const a=document.createElement("a")
-
-a.textContent=item.title
-
-a.onclick=()=>{
-
+function create(item, parent) {
+const a = document.createElement("a");
+a.textContent = item.title;
+a.href = "#"; // 阻止默认跳转
+a.onclick = (e) => {
+e.preventDefault();
 pdfDoc.getDestination(item.dest)
-.then(dest=>pdfDoc.getPageIndex(dest[0]))
-.then(index=>{
-
-pageNum=index+1
-
-renderPage(pageNum)
-
+.then(dest => {
+if (Array.isArray(dest) && dest.length > 0) {
+return pdfDoc.getPageIndex(dest[0]);
+} else if (typeof dest === 'string') {
+// 如果 dest 是一个字符串，可能是一个命名目的地
+return pdfDoc.getPageIndex(dest);
+}
+return Promise.reject("Invalid destination");
 })
-
-}
-
-parent.appendChild(a)
-
-if(item.items){
-
-item.items.forEach(i=>create(i,parent))
-
-}
-
-}
-
-outline.forEach(i=>create(i,toc))
-
+.then(index => {
+pageNum = index + 1;
+renderPage(pageNum);
 })
+.catch(error => console.error("Error navigating to destination:", error));
+};
+parent.appendChild(a);
 
+if (item.items && item.items.length > 0) {
+// 创建一个子菜单容器
+const subItems = document.createElement("div");
+subItems.style.paddingLeft = "15px"; // 缩进
+item.items.forEach(i => create(i, subItems));
+parent.appendChild(subItems);
+}
+}
+
+outline.forEach(i => create(i, toc));
+
+}).catch(error => {
+console.error("Error loading TOC:", error);
+});
+}
+
+// 更新 PDF 目录中的活跃链接
+function updateActiveTocLink(currentPage) {
+const tocLinks = document.querySelectorAll("#toc a");
+tocLinks.forEach(link => link.classList.remove("active-link"));
+
+if (!pdfDoc) return;
+
+// 遍历目录，找到最接近当前页面的条目
+let closestLink = null;
+let minDistance = Infinity;
+
+pdfDoc.getOutline().then(outline => {
+const flatOutline = [];
+function flattenOutline(items) {
+items.forEach(item => {
+flatOutline.push(item);
+if (item.items) flattenOutline(item.items);
+});
+}
+flattenOutline(outline);
+
+const promises = flatOutline.map(item => {
+return pdfDoc.getDestination(item.dest)
+.then(dest => {
+if (Array.isArray(dest) && dest.length > 0) {
+return pdfDoc.getPageIndex(dest[0]).then(index => ({ item, pageIndex: index + 1 }));
+} else if (typeof dest === 'string') {
+return pdfDoc.getPageIndex(dest).then(index => ({ item, pageIndex: index + 1 }));
+}
+return null;
+})
+.catch(() => null); // 捕获错误，避免中断所有 promise
+});
+
+Promise.all(promises).then(results => {
+results.forEach(result => {
+if (result && result.pageIndex <= currentPage) {
+const distance = currentPage - result.pageIndex;
+if (distance < minDistance) {
+minDistance = distance;
+closestLink = result.item;
+}
+}
+});
+
+if (closestLink) {
+tocLinks.forEach(link => {
+if (link.textContent === closestLink.title) {
+link.classList.add("active-link");
+// 滚动到活跃链接
+link.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+});
+}
+});
+});
 }
 
 /* 搜索 */
+function search() {
+const q = document.getElementById("searchBox").value.toLowerCase();
+const tocLinks = document.querySelectorAll("#toc a");
 
-function search(){
-
-const q=document.getElementById("searchBox")
-.value.toLowerCase()
-
-document.querySelectorAll("#toc a")
-.forEach(a=>{
-
-a.style.display=
+tocLinks.forEach(a => {
+a.style.display =
 a.textContent.toLowerCase().includes(q)
-?"block":"none"
-
-})
-
+? "block"
+: "none";
+});
 }
 
-loadFolders()
+loadFolders();
 
 </script>
 
