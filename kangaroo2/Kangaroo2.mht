@@ -1,0 +1,953 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+<HTML lang=zh-CN><HEAD><TITLE>Kangaroo Manual (Grasshopper ...</TITLE>
+<SCRIPT>function a(c){this.t={};this.tick=function(c,e,b){b=b!=void 0?b:(new Date).getTime();this.t[c]=[b,e]};this.tick("start",null,c)}var d=new a;window.jstiming={Timer:a,load:d};try{var f=null;window.chrome&&window.chrome.csi&&(f=Math.floor(window.chrome.csi().pageT));f==null&&window.gtbExternal&&(f=window.gtbExternal.pageT());f==null&&window.external&&(f=window.external.pageT);f&&(window.jstiming.pt=f)}catch(g){};
+</SCRIPT>
+
+<META content="text/html; charset=utf-8" http-equiv=Content-Type>
+<STYLE type=text/css>TABLE {
+	LINE-HEIGHT: inherit; BORDER-COLLAPSE: collapse; FONT-SIZE: 1em
+}
+TR {
+	TEXT-ALIGN: left
+}
+DIV {
+	MARGIN-TOP: 0px; MARGIN-BOTTOM: 0px
+}
+ADDRESS {
+	MARGIN-TOP: 0px; MARGIN-BOTTOM: 0px
+}
+OL {
+	MARGIN-TOP: 0px; MARGIN-BOTTOM: 0px
+}
+UL {
+	MARGIN-TOP: 0px; MARGIN-BOTTOM: 0px
+}
+LI {
+	MARGIN-TOP: 0px; MARGIN-BOTTOM: 0px
+}
+OPTION {
+	MARGIN-TOP: 0px; MARGIN-BOTTOM: 0px
+}
+SELECT {
+	MARGIN-TOP: 0px; MARGIN-BOTTOM: 0px
+}
+P {
+	MARGIN: 0px
+}
+PRE {
+	MARGIN: 0px; FONT-FAMILY: Courier New; WHITE-SPACE: pre-wrap
+}
+BODY {
+	PADDING-BOTTOM: 0px; BACKGROUND-COLOR: #ffffff; MARGIN: 6px; PADDING-LEFT: 0px; PADDING-RIGHT: 0px; FONT-FAMILY: Verdana, sans-serif; COLOR: #000; FONT-SIZE: 10pt; PADDING-TOP: 0px
+}
+IMG {
+	-moz-force-broken-image-icon: 1
+}
+
+@media Screen    
+{
+HTML.pageview {
+	OVERFLOW-X: hidden; OVERFLOW-Y: scroll; BACKGROUND-COLOR: #f3f3f3 !important
+}
+BODY {
+	MIN-HEIGHT: 1100px; COUNTER-RESET: __goog_page__
+}
+* HTML BODY {
+	HEIGHT: 1100px
+}
+.pageview BODY {
+	BORDER-BOTTOM: #bbb 2px solid; BORDER-LEFT: #ccc 1px solid; PADDING-BOTTOM: 40px; MARGIN: 15px auto 25px; PADDING-LEFT: 50px; WIDTH: 648px !important; PADDING-RIGHT: 50px; BORDER-TOP: #ccc 1px solid; BORDER-RIGHT: #bbb 2px solid; PADDING-TOP: 40px
+}
+* HTML {
+	OVERFLOW-Y: scroll
+}
+* HTML.pageview BODY {
+	OVERFLOW-X: auto
+}
+.writely-callout-data {
+	WIDTH: 0px; DISPLAY: inline-block; HEIGHT: 0px; OVERFLOW: hidden
+}
+.writely-footnote-marker {
+	BACKGROUND-IMAGE: url(images/footnote_doc_icon.gif); BACKGROUND-COLOR: transparent; WIDTH: 7px; BACKGROUND-REPEAT: no-repeat; HEIGHT: 16px; VERTICAL-ALIGN: top; OVERFLOW: hidden; -moz-user-select: none
+}
+.editor .writely-footnote-marker {
+	CURSOR: move
+}
+.writely-footnote-marker-highlight {
+	BACKGROUND-POSITION: -15px 0px; -moz-user-select: text
+}
+.writely-footnote-hide-selection {
+	CURSOR: move
+}
+.writely-comment-yellow {
+	BACKGROUND-COLOR: #ffffd7
+}
+.writely-comment-orange {
+	BACKGROUND-COLOR: #ffe3c0
+}
+.writely-comment-pink {
+	BACKGROUND-COLOR: #ffd7ff
+}
+.writely-comment-green {
+	BACKGROUND-COLOR: #d7ffd7
+}
+.writely-comment-blue {
+	BACKGROUND-COLOR: #d7ffff
+}
+.writely-comment-purple {
+	BACKGROUND-COLOR: #eed7ff
+}
+#cb-p-tgt {
+	PADDING-BOTTOM: 0.4em; BACKGROUND-COLOR: #ddd; PADDING-LEFT: 0.4em; PADDING-RIGHT: 0.4em; COLOR: #333; FONT-SIZE: 8pt; PADDING-TOP: 0.4em
+}
+#cb-p-tgt-can {
+	COLOR: #36c; MARGIN-LEFT: 2em; FONT-WEIGHT: bold; TEXT-DECORATION: underline
+}
+#cb-p-tgt .spin {
+	WIDTH: 16px; BACKGROUND: url(//ssl.gstatic.com/docs/clipboard/spin_16o.gif) no-repeat; HEIGHT: 16px
+}
+    }
+H6 {
+	FONT-SIZE: 8pt
+}
+H5 {
+	FONT-SIZE: 8pt
+}
+H4 {
+	FONT-SIZE: 10pt
+}
+H3 {
+	FONT-SIZE: 12pt
+}
+H2 {
+	FONT-SIZE: 14pt
+}
+H1 {
+	FONT-SIZE: 18pt
+}
+BLOCKQUOTE {
+	BORDER-BOTTOM: #ddd 1px dashed; BORDER-LEFT: #ddd 1px dashed; PADDING-BOTTOM: 10px; PADDING-LEFT: 10px; PADDING-RIGHT: 10px; BORDER-TOP: #ddd 1px dashed; BORDER-RIGHT: #ddd 1px dashed; PADDING-TOP: 10px
+}
+.webkit-indent-blockquote {
+	BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; BORDER-TOP: medium none; BORDER-RIGHT: medium none
+}
+A IMG {
+	BORDER-BOTTOM: 0px; BORDER-LEFT: 0px; BORDER-TOP: 0px; BORDER-RIGHT: 0px
+}
+.pb {
+	PAGE-BREAK-AFTER: always; BORDER-RIGHT-WIDTH: 0px; WIDTH: 100% !important; BORDER-TOP-WIDTH: 0px; BORDER-BOTTOM-WIDTH: 0px; HEIGHT: 1px !important; BORDER-LEFT-WIDTH: 0px
+}
+.editor .pb {
+	BORDER-BOTTOM: #c0c0c0 1px dashed; BORDER-TOP: #c0c0c0 1px dashed
+}
+DIV.google_header {
+	POSITION: relative; MARGIN-TOP: 1em; MARGIN-BOTTOM: 1em
+}
+DIV.google_footer {
+	POSITION: relative; MARGIN-TOP: 1em; MARGIN-BOTTOM: 1em
+}
+.editor DIV.writely-toc {
+	BORDER-BOTTOM: #ccc 1px solid; BORDER-LEFT: #ccc 1px solid; BACKGROUND-COLOR: #f3f3f3; BORDER-TOP: #ccc 1px solid; BORDER-RIGHT: #ccc 1px solid
+}
+.writely-toc > OL {
+	PADDING-LEFT: 3em; FONT-WEIGHT: bold
+}
+OL.writely-toc-subheading {
+	PADDING-LEFT: 1em; FONT-WEIGHT: normal
+}
+* HTML writely-toc OL {
+	LIST-STYLE-POSITION: inside
+}
+.writely-toc-none {
+	LIST-STYLE-TYPE: none
+}
+.writely-toc-decimal {
+	LIST-STYLE-TYPE: decimal
+}
+.writely-toc-upper-alpha {
+	LIST-STYLE-TYPE: upper-alpha
+}
+.writely-toc-lower-alpha {
+	LIST-STYLE-TYPE: lower-alpha
+}
+.writely-toc-upper-roman {
+	LIST-STYLE-TYPE: upper-roman
+}
+.writely-toc-lower-roman {
+	LIST-STYLE-TYPE: lower-roman
+}
+.writely-toc-disc {
+	LIST-STYLE-TYPE: disc
+}
+UL[type='i'] {
+	LIST-STYLE-TYPE: disc
+}
+UL[type='I'] {
+	LIST-STYLE-TYPE: disc
+}
+UL[type='1'] {
+	LIST-STYLE-TYPE: disc
+}
+UL[type='a'] {
+	LIST-STYLE-TYPE: disc
+}
+UL[type='A'] {
+	LIST-STYLE-TYPE: disc
+}
+OL[type='disc'] {
+	LIST-STYLE-TYPE: decimal
+}
+OL[type='circle'] {
+	LIST-STYLE-TYPE: decimal
+}
+OL[type='square'] {
+	LIST-STYLE-TYPE: decimal
+}
+BODY {
+	LINE-HEIGHT: normal; BACKGROUND-COLOR: #ffffff; FONT-FAMILY: Garamond; FONT-SIZE: 12pt
+}
+.editor A:visited {
+	COLOR: #551a8b
+}
+.editor TABLE.zeroBorder {
+	BORDER-BOTTOM: gray 1px dotted; BORDER-LEFT: gray 1px dotted; BORDER-TOP: gray 1px dotted; BORDER-RIGHT: gray 1px dotted
+}
+.editor TABLE.zeroBorder TD {
+	BORDER-BOTTOM: gray 1px dotted; BORDER-LEFT: gray 1px dotted; BORDER-TOP: gray 1px dotted; BORDER-RIGHT: gray 1px dotted
+}
+.editor TABLE.zeroBorder TH {
+	BORDER-BOTTOM: gray 1px dotted; BORDER-LEFT: gray 1px dotted; BORDER-TOP: gray 1px dotted; BORDER-RIGHT: gray 1px dotted
+}
+.editor DIV.google_header {
+	BORDER-BOTTOM: #dddddd 2px dashed; POSITION: static; BORDER-LEFT: #dddddd 2px dashed; MIN-HEIGHT: 2em; WIDTH: 100%; BORDER-TOP: #dddddd 2px dashed; BORDER-RIGHT: #dddddd 2px dashed
+}
+.editor DIV.google_footer {
+	BORDER-BOTTOM: #dddddd 2px dashed; POSITION: static; BORDER-LEFT: #dddddd 2px dashed; MIN-HEIGHT: 2em; WIDTH: 100%; BORDER-TOP: #dddddd 2px dashed; BORDER-RIGHT: #dddddd 2px dashed
+}
+.editor .misspell {
+	BACKGROUND-COLOR: yellow
+}
+.editor .writely-comment {
+	BORDER-BOTTOM: #c0c0c0 1px dashed; BORDER-LEFT: #c0c0c0 1px dashed; PADDING-BOTTOM: 1px; LINE-HEIGHT: 1.4; PADDING-LEFT: 1px; PADDING-RIGHT: 1px; FONT-SIZE: 9pt; BORDER-TOP: #c0c0c0 1px dashed; BORDER-RIGHT: #c0c0c0 1px dashed; PADDING-TOP: 1px
+}
+</STYLE>
+
+<STYLE>BODY {
+	MARGIN: 0px
+}
+#doc-contents {
+	MARGIN: 6px
+}
+#google-view-footer {
+	PADDING-BOTTOM: 0.3em; CLEAR: both; BORDER-TOP: thin solid; PADDING-TOP: 0.3em
+}
+A.google-small-link:link {
+	FONT-FAMILY: Arial, Sans-serif; COLOR: #112abb; FONT-SIZE: 11px !important
+}
+A.google-small-link:visited {
+	FONT-FAMILY: Arial, Sans-serif; COLOR: #112abb; FONT-SIZE: 11px !important
+}
+BODY {
+	DIRECTION: inherit
+}
+P {
+	DIRECTION: inherit
+}
+DIV {
+	DIRECTION: inherit
+}
+TD {
+	DIRECTION: inherit
+}
+
+@media Print    
+{
+#google-view-footer {
+	DISPLAY: none
+}
+
+}
+</STYLE>
+
+<SCRIPT>
+function viewOnLoad() {
+if (document.location.href.indexOf('spi=1') != -1) {
+if (navigator.userAgent.toLowerCase().indexOf('msie') != -1) {
+window.print();
+} else {
+window.setTimeout(window.print, 10);
+}
+}
+if (document.location.href.indexOf('hgd=1') != -1) {
+var footer = document.getElementById("google-view-footer");
+if (footer) {
+footer.style.display = 'none';
+}
+}
+}
+</SCRIPT>
+
+<META name=GENERATOR content="MSHTML 8.00.7600.16385"></HEAD>
+<BODY 
+onload="window.jstiming.load.tick('ol'); window.jstiming.report(window.jstiming.load, null, document.location.protocol == 'https:' ? 'https://gg.google.com/csi' : null);">
+<DIV id=doc-contents>
+<DIV style="TEXT-ALIGN: center" id=fhmr><IMG 
+style="WIDTH: 400px; HEIGHT: 138.95px" 
+src="https://docs.google.com/File?id=ddpv99dx_5fmksxhcs_b"></DIV>
+<DIV style="TEXT-ALIGN: center"><FONT face=Tahoma><FONT size=4>Using Kangaroo 
+(Grasshopper version)</FONT></FONT></DIV>
+<DIV style="TEXT-ALIGN: center"><FONT face=Tahoma><FONT 
+size=4>(DRAFT)</FONT></FONT></DIV>
+<DIV style="TEXT-ALIGN: center"><FONT size=4><BR></FONT></DIV>
+<DIV style="TEXT-ALIGN: left"><I><FONT size=2>(you can download this as a pdf, 
+but then you won't get the animations)</FONT></I></DIV>
+<H2><FONT size=4>Contents</FONT></H2>
+<BLOCKQUOTE 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; MARGIN: 0px 0px 0px 40px; BORDER-TOP: medium none; BORDER-RIGHT: medium none" 
+class=webkit-indent-blockquote>
+  <DIV><FONT size=3>Intro</FONT></DIV>
+  <DIV><FONT size=3>Credits<BR></FONT><FONT size=3>Getting Started / 
+  Installation</FONT><BR><FONT size=3>What is a particle system ?</FONT></DIV>
+  <DIV><FONT size=3>Main Kangaroo Component</FONT></DIV>
+  <DIV><FONT size=3>Running the Simulation</FONT></DIV>
+  <DIV><FONT size=3>Conceptual background - Newton's Laws</FONT></DIV>
+  <DIV><FONT size=3>Discretization</FONT></DIV>
+  <DIV><FONT size=3>Springs</FONT></DIV>
+  <DIV><FONT size=3>Cut-offs</FONT></DIV>
+  <DIV><FONT size=3>Power Laws</FONT></DIV>
+  <DIV><FONT size=3>Combining Forces</FONT></DIV>
+  <DIV><FONT size=3>Bending</FONT></DIV>
+  <DIV><FONT size=3>Drag</FONT></DIV>
+  <DIV><FONT size=3>Outputs</FONT></DIV><FONT size=3>FAQ<BR></FONT></BLOCKQUOTE>
+<H2>Intro</H2>
+<DIV><FONT size=3>Kangaroo is an add-on for Grasshopper/Rhino and Generative 
+Components which embeds physical behaviour directly in the 3D modelling 
+environment and allows you to interact with it 'live' as the simulation is 
+running.</FONT></DIV>
+<DIV><FONT size=3>It can be used for various sorts of optimization, structural 
+analysis, animation and more.</FONT></DIV><FONT size=3><BR></FONT>
+<DIV><FONT size=3><FONT size=3>This guide assumes you are already reasonably 
+competent in Rhino and Grasshopper. If you aren't don't worry though, they are 
+both pretty intuitive and easy to pick up the basics of, with plenty of good 
+online documentation and support available:</FONT><BR></FONT></DIV>
+<DIV><FONT size=3><A 
+href="http://www.rhino3d.com/support.htm">http://www.rhino3d.com/support.htm</A><BR></FONT></DIV>
+<DIV><FONT size=3><A 
+href="http://www.grasshopper3d.com/">http://www.grasshopper3d.com/</A></FONT></DIV><FONT 
+size=3><BR></FONT>Author - Daniel Piker
+<DIV>Development team - Robert Cervellione, Giulio Piacentino, Daniel 
+Piker</DIV><BR>
+<DIV>Big thanks to:<BR>
+<DIV><FONT size=3>David Rutten, Bob McNeel, Andrew Payne<FONT size=3>, Luis 
+Fraguada</FONT>, <FONT size=3>Moritz Fleischmann,&nbsp;</FONT>Jaryd Carolin, 
+Rabindranath Andujar, Steve Baer, Chris Williams, Sam Joyce, UTO, Studio Mode, 
+Gennaro Senatore</FONT></DIV>
+<DIV><FONT size=3>(loads more to add here, sorry if I've missed you 
+out)</FONT></DIV><BR>
+<DIV><FONT size=3>The development of Kangaroo is currently not supported or 
+funded by any company or institution.</FONT></DIV>
+<DIV><FONT size=3>It is shared freely in the hope that you will enjoy it and use 
+it for original and creative work.</FONT></DIV>
+<DIV><FONT size=3>It is free to use for academic and commercial 
+purposes.</FONT></DIV>
+<DIV><FONT size=3>Attribution and feedback is always 
+appreciated.</FONT></DIV><FONT size=3><BR></FONT>
+<DIV><B><FONT size=4>Disclaimer</FONT></B></DIV><B><FONT size=4><BR></FONT></B>
+<DIV><FONT size=3><FONT size=3>Please bear in mind that Kangaroo is still very 
+much a work in progress, which you use entirely at your own risk. While every 
+effort has been made to make its behaviour physically correct, no guarantee of 
+accuracy is given.</FONT><BR></FONT></DIV>
+<DIV><FONT size=3>The developers are under no obligation to provide 
+support.</FONT></DIV>
+<H2>Getting started</H2>You have presumably already downloaded Kangaroo itself. 
+At the time of writing the latest public release is 0.044. Links to any future 
+updates will be posted at <A id=q3r9 title=kangaroophysics.com 
+href="http://kangaroophysics.com/">kangaroophysics.com</A><BR><BR>
+<DIV>You will also need an up to date version of Rhino 4 (currently Service 
+Release 8)</DIV>
+<DIV>or the latest Rhino 5 beta.</DIV>
+<DIV>If you do not already own Rhino you can still use Grasshopper and Kangaroo 
+by downloading the fully featured trial version from <A 
+href="http://www.rhino3d.com/download.htm">http://www.rhino3d.com/download.htm</A>.</DIV>
+<DIV>You need to have the Grasshopper plugin installed. It is free and you can 
+download the latest version from <A 
+href="http://www.grasshopper3d.com/">http://www.grasshopper3d.com/</A>.</DIV>
+<DIV><BR>To install Kangaroo, simply move the .gha file into the grasshopper 
+components directory&nbsp;</DIV>
+<DIV>(typically C:\Program Files\Rhinoceros 
+4.0\Plug-ins\Grasshopper\Components)</DIV>
+<DIV>and restart Rhino.</DIV>
+<DIV>Alternatively, to avoid having your custom components overwritten whenever 
+Grasshopper auto-updates you can create a separate directory somewhere else on 
+your hard disk then type GrasshopperDeveloperSettings from the Rhino command 
+line and add a search path to that directory.</DIV>
+<DIV>Kangaroo 0.044 is not compatible with files created with pre 0.04 versions 
+of the plug-in.<BR></DIV><BR>
+<H2>What is a particle system ?</H2>
+<BLOCKQUOTE 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; MARGIN: 0px 0px 0px 40px; BORDER-TOP: medium none; BORDER-RIGHT: medium none" 
+class=webkit-indent-blockquote>
+  <DIV>"Particles are objects that have mass, position, and velocity, and 
+  respond to forces, but that have no spatial extent.. ..Despite their 
+  simplicity, particles can be made to exhibit a wide range of interesting 
+  behavior. For example, a wide variety of nonrigid structures can be built by 
+  connecting particles with simple damped springs."</DIV>
+  <DIV><FONT size=2>[Witkin 97]</FONT></DIV></BLOCKQUOTE><BR>The particles we deal 
+with in Kangaroo are an abstraction, but one with a strong connection to our 
+understanding of how the real world works at a fundamental level.
+<DIV>Macroscopic properties of materials such as their behaviour in bending, 
+shear and torsion can actually be seen as <B><I>emergent</I></B>&nbsp;on a 
+molecular level from simple interaction between pairs of particles.</DIV><BR>
+<DIV>Of course in the real world, objects are made out of vastly more particles 
+than we use in simulation, but if some care is taken about how we distribute the 
+points and their masses we can get quite good approximations of real physical 
+behaviour using this method.</DIV><BR>
+<DIV>While they do have their limitations, one great advantage of particle 
+systems is that they are easily understood and controlled (compared with more 
+sophisticated continuum models).</DIV>
+<DIV>This conceptual simplicity makes it possible for designers to apply and 
+manipulate the physics simulation in a very direct way, without needing 
+specialist technical knowledge.<BR><BR>
+<DIV>(by the way, the terms <I><B>particle, node </B><SPAN 
+style="FONT-STYLE: normal">and&nbsp;</SPAN><B>point</B></I>&nbsp;are used fairly 
+interchangeably in this guide)<BR><FONT size=4><BR></FONT></DIV>
+<DIV><IMG 
+style="WIDTH: 30px; FLOAT: left; HEIGHT: 30px; MARGIN-LEFT: 1em; MARGIN-RIGHT: 0px" 
+src="https://docs.google.com/File?id=ddpv99dx_7c723mbck_b">
+<DIV><FONT size=4><B>The main Kangaroo engine component</B></FONT></DIV><FONT 
+size=4><B><BR></B></FONT>
+<DIV>To start creating a simulation you must place the main Kangaroo component 
+on the canvas.</DIV>
+<DIV>(After installation and restarting Grasshopper all Kangaroo components 
+should appear under the 'Extra' tab).</DIV><BR>You only need one instance of 
+this component per definition.</DIV><BR>
+<DIV>Remember that hovering over a component without clicking will show a very 
+brief description of what it does, and hovering over each of the inputs or 
+outputs will display further information.</DIV><BR>
+<DIV><B><FONT size=4>- Force Objects</FONT></B></DIV>Kangaroo contains various 
+ways of generating forces which affect the particles in the simulation. All of 
+these are fed into the 'Force Objects' input.</DIV>Forces can come from various 
+sources - the response of materials to deformation (elasticity), user input, 
+geometric constraints...
+<DIV>By treating all of these within the common language of force vectors 
+Kangaroo allows live interaction between them.<BR><BR>
+<DIV>The input to Force objects needs to be a flattened list. (To flatten the 
+input right click on the name and select Flatten).</DIV>
+<DIV>All the different possible types of forces are covered in more detail later 
+in this guide.</DIV><BR>
+<DIV><B><FONT size=4>- Anchor Points</FONT></B></DIV>
+<DIV>These can be used to keep points fixed in a certain location. No matter 
+what forces are applied to them they will not be moved by Kangaroo. However, you 
+can still move them in Rhino to interact with the simulation as it is 
+running.</DIV><BR><B><FONT size=4>Particle consolidation - Joining objects 
+together</FONT></B><BR><FONT size=4><B><BR></B></FONT>
+<DIV><FONT size=3>If two or more points in the initial input (Force Objects and 
+anchors) are in the same position (to within the tolerance setting) they will 
+get joined together and treated as a single particle by Kangaroo.</FONT></DIV>
+<DIV><FONT size=3>There is no need to specifically weld objects to each 
+other.</FONT></DIV><FONT size=3><BR></FONT>
+<DIV><FONT size=3>Anchor points which start out coincident to points of Force 
+Objects (such as the end of a spring) will therefore move those objects around 
+with them when you move them during the simulation.</FONT></DIV>
+<DIV><FONT size=3>Bear in mind though, if you stop the simulation and Reset it, 
+if the anchor points no longer coincide with the points of the force objects 
+they will no longer be connected. So you may sometimes need to undo your 
+movements of the Anchor points in Rhino before running the simulation 
+again.</FONT></DIV>
+<DIV><FONT size=3>(add illustration)</FONT></DIV><FONT size=3><BR></FONT>
+<DIV><FONT size=3>For now if you do want to have to objects start in the same 
+place but not get joined you must move them apart by a small amount. 
+(illustration)</FONT></DIV>
+<DIV><FONT size=3>If there is demand for it I could add an 'unweld' component to 
+get around this.<BR></FONT><BR>
+<DIV><B><FONT size=4>- Settings</FONT></B>&nbsp;</DIV>
+<DIV>There are a number of global settings for the simulation which can be 
+accessed from the 'settings' input of the main Kangaroo component.</DIV>You can 
+access these settings either by adding a settings component to the canvas (the 
+spanner/screwdriver icon), or via the rollout menu when you right-click the 
+settings input (though watch out - settings adjusted in this way are currently 
+not saved with your ghx definition).</DIV><BR>
+<DIV>-Tolerance</DIV>
+<DIV>The minimum distance between separate points. Points closer than this will 
+be consolidated into one.</DIV><BR>
+<DIV>-TimeStep</DIV>
+<DIV>How far through time the system moves at each iteration. Smaller values 
+will result in a more stable, but slower simulation. Stronger forces and stiffer 
+springs require smaller timesteps.</DIV><BR>
+<DIV>-SubIterations</DIV>The number of iterations calculated between each time 
+the solution is drawn on screen.<BR><BR>
+<DIV>-Floor</DIV>
+<DIV>A simple constraint which can be switched on or off preventing particles 
+moving below Z=0</DIV>
+<DIV>This is much faster than Brep collision.</DIV><BR>
+<DIV>-Drag</DIV>A force on all particles resisting their motion.This is 
+essential to make a system settle down to a static equilibrium position. If drag 
+is too low, the system will oscillate for a long time, if it is too high, the 
+particles will move slowly.<BR><BR>
+<DIV>-Restitution</DIV>
+<DIV>How elastic collisions between particles and the floor are. If 1 then 
+particles bounce back to the height from which they were dropped, if 0 they do 
+not bounce at all.</DIV><BR>
+<DIV>-StaticFriction</DIV>
+<DIV>-KineticFriction</DIV><BR>
+<DIV>-Settle</DIV><BR>
+<DIV>-Tumble</DIV>
+<DIV>How much horizontal velocity is conserved in collisions between particles 
+and the floor.</DIV><BR>
+<DIV>-Sound</DIV>
+<DIV>Sound effects. This feature is disabled in the current version.</DIV><BR>
+<DIV>-Solver</DIV>
+<DIV>The integration method used by Kangaroo to calculate new positions for the 
+particles.<BR><BR>
+<DIV><B><FONT size=4>Utilities</FONT></B></DIV><BR>
+<DIV>Kangaroo contains a remove duplicates tool :
+<DIV><IMG style="WIDTH: 31px; HEIGHT: 30px" id=pc09 
+src="https://docs.google.com/File?id=ddpv99dx_8s2w5thqh_b">&nbsp;which can be 
+used to clean up lists of points. It has a tolerance setting which you can set 
+to some small value (such as 0.01) so that any points closer than this will be 
+combined into one.<BR></DIV><BR>
+<DIV>RemoveLines</DIV><BR>
+<DIV>InterConnect</DIV>
+<DIV style="TEXT-ALIGN: left" id=ydtx>
+<H2>Running the simulation</H2></DIV>To start and stop the simulation you need 
+to attach a Toggle (Parameters&gt;Special&gt;Boolean Toggle) to the 
+<B>SimulationReset</B> input of Kangaroo. When this is set to True Kangaroo does 
+some initial pre-calculation and matches all the inputs to the appropriate 
+points. When it is set to False the simulation moves forward one iteration every 
+time the grasshopper solution updates.</DIV><BR>
+<DIV>To make the simulation continuously update you need to attach a Timer 
+component (Parameters&gt;Special&gt;Timer). Drag the dotted line from the timer 
+to any part of the Kangaroo component. The timer has an 
+<B>interval</B>&nbsp;setting which controls how long it waits between updating 
+the solution. Right click and change this interval to 1ms to get the maximum 
+speed.</DIV>
+<DIV style="TEXT-ALIGN: left" id=rb9s><IMG style="WIDTH: 201px; HEIGHT: 219px" 
+src="https://docs.google.com/File?id=ddpv99dx_12dntv5pfs_b"></DIV>
+<DIV style="TEXT-ALIGN: left" id=rb9s><BR></DIV>
+<DIV style="TEXT-ALIGN: left" id=rb9s>Displaying the Grasshopper canvas takes 
+quite a lot of memory and slows down the simulation considerably. To avoid this 
+you can minimize it while running your simulation.</DIV>
+<DIV style="TEXT-ALIGN: left" id=rb9s>Instead of double-clicking the Timer 
+component to turn it on and off you can double click the global toggle which 
+will appear on your Taskbar the first time you use the Timer.</DIV>
+<DIV style="TEXT-ALIGN: left" id=rb9s>
+<DIV style="TEXT-ALIGN: left" id=sbbm><IMG style="WIDTH: 120px; HEIGHT: 29.37px" 
+src="https://docs.google.com/File?id=ddpv99dx_13g9dt9vg9_b"></DIV></DIV><BR>
+<H2><U>Newton's Laws</U></H2><I><BR></I><FONT face=sans-serif><I><FONT 
+size=3><B>The change of momentum of a body is proportional to the impulse 
+impressed on the body, and happens along the straight line on which that impulse 
+is impressed</B></FONT></I></FONT><BR><I><BR></I>
+<DIV><I>(illustration)</I></DIV>
+<DIV><I><BR></I><FONT size=3>This law is probably most familiar to you as &nbsp; 
+&nbsp; &nbsp;</FONT></DIV><B><BR></B>
+<BLOCKQUOTE 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; MARGIN: 0px 0px 0px 40px; BORDER-TOP: medium none; BORDER-RIGHT: medium none" 
+class=webkit-indent-blockquote>
+  <DIV><FONT size=3><B>&nbsp;&nbsp; F &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;= &nbsp; 
+  &nbsp; &nbsp; &nbsp; ma &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+&nbsp;</B>(1)</FONT></DIV></BLOCKQUOTE>
+<BLOCKQUOTE 
+style="BORDER-BOTTOM: medium none; BORDER-LEFT: medium none; MARGIN: 0px 0px 0px 40px; BORDER-TOP: medium none; BORDER-RIGHT: medium none" 
+class=webkit-indent-blockquote>
+  <DIV><FONT size=3>force &nbsp;&nbsp;&nbsp;= &nbsp; mass&nbsp;<IMG 
+  style="VERTICAL-ALIGN: middle" class="ee_img tr_noresize" alt="\times " 
+  src="https://www.google.com/chart?cht=tx&amp;chf=bg,s,FFFFFF00&amp;chco=000000&amp;chl=%5Ctimes%20" 
+  eeimg="1">&nbsp;acceleration</FONT></DIV></BLOCKQUOTE><FONT size=3><BR>Which we 
+rearrange to get &nbsp; &nbsp;<B>&nbsp;a=F/m &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+&nbsp;</B>(2)<BR><BR></FONT>
+<DIV><FONT size=3>Kangaroo works by finding the total force vector F for each 
+particle by adding up all the different forces acting on it, using Newton's 
+second law to get the acceleration, and numerically integrating the resulting 
+differential equation of motion over time to find new positions for all the 
+particles.</FONT></DIV><FONT size=3><BR></FONT>
+<DIV><FONT size=3>Note that in Kangaroo&nbsp;</FONT><I><B><FONT 
+size=3>mass</FONT></B></I><FONT size=3>&nbsp;is not automatically associated 
+with </FONT><I><B><FONT size=3>weight</FONT></B></I><FONT size=3>.</FONT></DIV>
+<DIV><FONT size=3>More <B>mass</B>ive objects take more force to change their 
+velocity.</FONT></DIV>
+<DIV><FONT size=3><B>Weight</B> is the force on an object due to 
+gravity.</FONT></DIV>
+<DIV><FONT size=3>In real life an object's weight is proportional to its 
+mass.</FONT></DIV>
+<DIV><FONT size=3>In Kangaroo you can easily make this the case, or you can 
+assign them completely independently (for example in order to test specific 
+loading cases).</FONT></DIV><FONT size=3><BR></FONT>
+<DIV><FONT size=3>It is possible to assign a particle zero weight, but giving a 
+particle zero mass would result in a division by zero in equation (2) above and 
+cause an error.</FONT></DIV><FONT size=3><BR></FONT>
+<DIV><FONT size=3>You do not always have to specify values for mass - if no 
+specific input is provided, all particles will be assigned a default mass of 
+1.</FONT></DIV>
+<DIV><FONT size=3>To assign a particle a particular mass, or give it an initial 
+velocity, use the Particle component.</FONT></DIV><FONT size=3><BR></FONT>
+<DIV><FONT size=3>To include the effects of gravity and give a particle weight, 
+you must apply a <B><I>Unary force</I></B> to it.&nbsp;</FONT></DIV><FONT 
+size=3><BR></FONT>
+<DIV><FONT size=3>(illustration)</FONT></DIV><BR>
+<DIV><FONT size=4><I><FONT face=Arial>To every action there is always an equal 
+and opposite reaction</FONT></I></FONT></DIV>
+<DIV><I><FONT size=4>(illustration)</FONT></I></DIV><FONT size=4><BR></FONT>
+<P>This is why Kangaroo uses lines to input forces. Each force is an interaction 
+between a pair of particles - the endpoints of the line. The force acts in the 
+direction of the line and is added to one particle and subtracted from the 
+other.</P>
+<P><BR></P>
+<P><B>Unary</B> forces are an exception to this - they only apply to single 
+particles. However, what we are effectively doing here is pairing the single 
+particle with another infinitely distant and infinitely massive particle - a 
+reasonable approximation to the centre of the earth for many practical 
+purposes.&nbsp;</P>
+<P><BR></P>
+<P></P>
+<DIV><FONT face=sans-serif><I><FONT size=3>&nbsp;<B>Every body persists in its 
+state of being at rest or of moving uniformly straight forward, except insofar 
+as it is compelled to change its state by force 
+impressed</B></FONT></I></FONT><BR></DIV>
+<DIV><I>(illustration of vector summation)</I></DIV><BR>
+<DIV><I><SPAN style="FONT-STYLE: normal">If the forces on a particle sum to zero 
+then it will not accelerate.</SPAN></I></DIV><BR>
+<DIV>Conversely, while the forces do <I>not</I> sum to zero, the particle's 
+velocity will continue to change.<BR>
+<P></P>If we include in our simulation some form of <I><B>friction</B></I> or 
+<I><B>drag</B><SPAN style="FONT-STYLE: normal">&nbsp;then all particles will 
+continue to move until they eventually settle in an <B>equilibrium</B> position 
+where the net forces on each particle sum to zero.</SPAN></I></DIV><I><BR></I>
+<DIV>(I will eventually add a total KE output. We could then use this to tell 
+the simulation to run until it drops below some given threshold.)<BR>
+<H2>Discretization</H2>
+<DIV>Because the geometry of a spring in Kangaroo is determined by just 2 
+points, it can only ever be a straight line.</DIV>To make <B>flexible</B> 
+elements we must first <B>break them up into smaller pieces</B> and model each 
+segment as a separate spring.</DIV>
+<DIV><BR>Here we make certain simplifications, for example, when modelling a 
+hanging chain we treat it as though all the mass is concentrated at the ends of 
+each segment, when in reality it is distributed over its length.</DIV>
+<DIV>However, provided some care is taken with how the masses and forces are 
+assigned then these <I><B>lumped mass</B></I> models can often provide a decent 
+approximation of continuum mechanics (even when quite coarse subdivision is 
+used).</DIV>
+<DIV><BR>
+<DIV><B>Cables</B></DIV><BR>
+<DIV>Cables can be divided up into segments either in Rhino or in 
+Grasshopper</DIV>
+<DIV>(illustration)</DIV>
+<DIV>Dividing the curves in Rhino might be easier for those less comfortable 
+with Grasshopper, but doing it in Grasshopper can make altering the definition 
+easier.</DIV>
+<DIV style="TEXT-ALIGN: left" id=v:0x><IMG 
+style="WIDTH: 320px; HEIGHT: 183.33px" 
+src="https://docs.google.com/File?id=ddpv99dx_24fv28ccd4_b"></DIV><I>a flexible 
+cable is modelled as made up of multiple straight segments</I><BR><BR><B>Sheet 
+materials - membranes, fabrics, paper etc.</B></DIV><BR>
+<DIV>The simplest way to make a sheet material in Kangaroo is to use a grid of 
+springs.</DIV>
+<DIV>Weaverbird (downloadable from <A 
+href="http://www.giuliopiacentino.com/weaverbird/">http://www.giuliopiacentino.com/weaverbird/</A>) 
+has some very useful components for extracting the edges of meshes as curves. 
+UTO's mesh tools (<A 
+href="http://utos.blogspot.com/p/downloads.html">http://utos.blogspot.com/p/downloads.html</A>) 
+are also very useful.<BR><BR></DIV>
+<DIV>A grid of zero rest length springs will behave something like a <B>soap 
+film</B> - trying to minimize area. So if you don't restrain the edges it will 
+shrink down to nothing. If you wanted to avoid this (for example if you are 
+simulating tensioned fabric), you could use a rest length for each spring which 
+was some multiple between 0 and 1 of it's start length (illustration). You could 
+also increase the stiffness of springs around the outside of the mesh to 
+simulate edge cables.</DIV>For catenary structures where you want to simulate a 
+hanging grid of chains you may want to make the rest length <I>more</I> than the 
+start length to give it some slack.<BR><BR>
+<DIV>To more realistically model the behaviour of <B>cloth</B> you may also want 
+to add <I><B>shear springs</B><SPAN style="FONT-STYLE: normal">&nbsp;- diagonals 
+which stop each square from deforming into a diamond shape.</SPAN></I></DIV>
+<DIV><I><SPAN style="FONT-STYLE: normal">(see&nbsp;<A 
+href="http://vimeo.com/15022048">http://vimeo.com/15022048</A>)</SPAN></I></DIV>
+<DIV><I><SPAN style="FONT-STYLE: normal">Different stiffness values can be used 
+for the main square grid springs and the shear springs for different cloth 
+properties.</SPAN></I></DIV>
+<DIV><I><SPAN style="FONT-STYLE: normal">There are a number of choices for how 
+these diagonals are added - 1 or 2 per quad, aligned or alternating. I haven't 
+tested much yet how this choice affects the behaviour.</SPAN></I></DIV>
+<DIV style="TEXT-ALIGN: left" id=x7xn><IMG style="WIDTH: 500px; HEIGHT: 149.6px" 
+src="https://docs.google.com/File?id=ddpv99dx_25ggc8cgd2_b"></DIV>
+<DIV>You can also add bending stiffness - (useful for some cloth behaviour and 
+particularly for sheet materials like paper or metal). The typical way to do 
+this is to connect springs between alternate points in the grid, but a better 
+way is to use the bending elements described in the section below on 
+rods.<BR><BR></DIV>
+<DIV><B>Rods</B></DIV><BR>
+<DIV>Bending resistance works with sets of 3 points. It will try to keep those 3 
+points in a straight line. So to model an <I><B>elastic rod </B><SPAN 
+style="FONT-STYLE: normal">you need to input the 1st 2nd and 3rd nodes, the 2nd 
+3rd and 4th nodes, etc</SPAN></I></DIV>
+<DIV><I><SPAN style="FONT-STYLE: normal">(illustration)</SPAN></I></DIV>
+<DIV><I><SPAN style="FONT-STYLE: normal">To fix the <B>tangent</B> of a rod 
+simply make 2 points at the end anchor points. To just fix the end position only 
+use one anchor point.</SPAN></I></DIV>There is currently no way to simulate 
+resistance to torsion for 1D elements in Kangaroo, so it is as though the rod is 
+free to twist about its own axis at the constrained ends. (Though you can make 
+solids with torsional resistance as described below).<BR><BR>
+<DIV><B>Solids</B></DIV><BR>(more to add here)<BR>
+<DIV><BR>
+<DIV>There are probably many more useful discretizations to be invented. Because 
+this part of things happens in grasshopper outside of the kangaroo code, anyone 
+has the control and freedom to explore 
+this.</DIV><BR><B><U>Springs</U></B><BR><BR>
+<DIV>It might seem odd at first to simulate entire structures with springs - but 
+we are not just talking about the kind of springs in car suspensions and 
+mattresses. Even the stiffest materials stretch and compress when we apply 
+forces to them.</DIV><BR>
+<DIV><B><I>Hooke's law</I></B> says that the force exerted by a spring is 
+directly proportional to the amount its length differs from its <I>natural</I> 
+or <I>rest</I> length.</DIV>
+<DIV>This is a simplification, but often a good approximation for many materials 
+in ordinary use.</DIV><BR>
+<DIV>Note there is no Kangaroo input for the <I><B>start length</B></I> of a 
+spring - it simply uses the length of the curve input to <I>springs.</I></DIV>
+<DIV>The&nbsp;<B><I>rest length</I></B> (also called natural or slack length) of 
+the spring is the length it 'wants' to be.</DIV>
+<DIV>If you do not supply a value for rest length it defaults to 0. Often you 
+will want to make the start length the same as the rest length - which you can 
+do by simply connecting the curve to the rest length input 
+(illustration).</DIV>You can also include a multiplier, so that the rest length 
+is some multiple of the start length. If this multiplier is between 0 and 1 it 
+will be like pre-tensioning the spring. (illustration)<BR><BR><U>Spring</U><BR>
+<DIV style="TEXT-ALIGN: left" id=q45c><IMG style="WIDTH: 519px; HEIGHT: 434px" 
+src="https://docs.google.com/File?id=ddpv99dx_19fpgh8smb_b"></DIV>The top graph 
+represents the force calculation that takes place within Kangaroo.</DIV>
+<DIV>The distance at which the line crosses the horizontal axis is the natural 
+length of the spring.</DIV>The stiffer the spring, the steeper the line.<BR><BR>
+<DIV>The bottom graph shows how the <B><I>potential energy</I></B> varies.</DIV>
+<DIV>Note that its speed(<B><I>kinetic energy</I></B>) is greatest when its 
+potential energy is lowest and vice-versa.</DIV>
+<DIV>Without drag it would keep sliding up the slope to the same height on the 
+opposite side as energy was converted back and forth between potential and 
+kinetic.</DIV>
+<DIV>When drag is added to the system these oscillations decrease in amplitude 
+until it settles in a position where the potential energy is 
+<B><I>minimized</I></B>. This is the essence of how physics-based 
+<B><I>optimization</I></B> in Kangaroo works.<BR><BR><U>Zero rest-length 
+spring<BR></U>
+<DIV style="TEXT-ALIGN: left" id=x7oq><IMG style="WIDTH: 519px; HEIGHT: 434px" 
+src="https://docs.google.com/File?id=ddpv99dx_18d2v5ddgp_b"></DIV><BR>Springs 
+with a natural length of zero are often useful. For example minimal surfaces can 
+be roughly approximated by treating all the edges of a mesh as zero-length 
+springs.<BR><BR></DIV>
+<DIV>
+<H2><U>Cut-offs</U></H2><B>Balls (Spring with positive Cutoff):</B><BR>
+<DIV style="TEXT-ALIGN: left" id=asdk><IMG style="WIDTH: 519px; HEIGHT: 434px" 
+src="https://docs.google.com/File?id=ddpv99dx_20csbph5tt_b"></DIV>
+<DIV style="TEXT-ALIGN: left" id=asdk>The SpringCutoffs input lets you specify a 
+distance beyond which to ignore the effect of the spring.</DIV>
+<DIV style="TEXT-ALIGN: left" id=asdk>If you use the same value for SpringLength 
+as for SpringCutoff, then the particles behave like a pair of solid balls which 
+exert no force on each other when they do not touch, but push apart when they 
+overlap (ie when the distance between their centres is <B><I>below</I></B> that 
+value, which should be equal to the <B><I>sum of the radii</I></B> of the 2 
+spheres) .</DIV>
+<DIV style="TEXT-ALIGN: left" id=asdk><BR></DIV><B>'Hamsterball' (Spring with 
+negative Cutoff):</B><BR>
+<DIV style="TEXT-ALIGN: left" id=u_uk><IMG style="WIDTH: 519px; HEIGHT: 434px" 
+src="https://docs.google.com/File?id=ddpv99dx_21d5rt86ct_b"></DIV>
+<DIV style="TEXT-ALIGN: left" id=u_uk><BR></DIV>
+<DIV style="TEXT-ALIGN: left" id=u_uk>If the value you supply to SpringCutoffs 
+is negative, then the force due to that spring will only have an effect 
+<B><I>above</I></B>&nbsp;that distance. When you make the Cutoff value the 
+negative of the SpringLength value, this is like one sphere being inside 
+another, with the value equal to the <B><I>difference between their 
+radii</I></B>.</DIV>
+<DIV style="TEXT-ALIGN: left" id=u_uk><BR></DIV>
+<DIV style="TEXT-ALIGN: left" id=u_uk>Cut-offs for Power Laws work in exactly 
+the same way as for springs.</DIV>
+<DIV style="TEXT-ALIGN: left" id=u_uk>They can be particularly helpful when 
+using power laws with a larger negative exponent (eg -3 or -4).</DIV>
+<DIV style="TEXT-ALIGN: left" id=u_uk>When the force increases very steeply at 
+short distances (see the section on Power Laws below) it can cause particles to 
+'explode' apart when they get too close. A small negative cutoff (say -0.1) can 
+help avoid this.</DIV>
+<DIV style="TEXT-ALIGN: left" id=u_uk><BR></DIV>
+<H2><U>Power Laws</U></H2>
+<DIV style="TEXT-ALIGN: left" id=xyh5><IMG style="WIDTH: 499px; HEIGHT: 410px" 
+src="https://docs.google.com/File?id=ddpv99dx_22fp2fjrfd_b"></DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5><BR></DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5>This shows a Power law force with 
+<B><I>exponent</I></B> <B>-1</B>, which means that the strength of the 
+attraction is proportional to the <B><I>inverse</I></B> of the distance between 
+the particles.</DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5><BR></DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5>A basic math reminder:</DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5><BR></DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5>&nbsp;<IMG style="VERTICAL-ALIGN: middle" 
+class="ee_img tr_noresize" alt="x^{-n} = \frac{1}{x^n}" 
+src="https://www.google.com/chart?cht=tx&amp;chf=bg,s,FFFFFF00&amp;chco=000000&amp;chl=x%5E%7B-n%7D%20%3D%20%5Cfrac%7B1%7D%7Bx%5En%7D" 
+eeimg="1"></DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5><BR></DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5>Using a more negative exponent (such as 
+<B>-2</B>, the familiar <B><I>inverse-square</I></B> law) would mean a force 
+which increased more sharply at short distances and fell off towards zero more 
+quickly at larger distances. (illustration)</DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5><BR></DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5>Power Laws in Kangaroo only accept 
+<B><I>integers</I></B> as exponents- because raising a number to an integer 
+power is much quicker to compute than raising it to an arbitrary rational 
+number, and most known real physical forces have integer exponents.</DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5>*edit - why is this ? are there any known 
+forces with non-integer exponents?</DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5><BR></DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5>If the strength of a Power Law is 
+<B><I>positive</I></B> then it is <B><I>repulsive</I></B> - it tries to 
+<B><I>maximize</I></B> the distance between the particles.</DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5><BR></DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5>If the strength of a Power Law is 
+<B><I>negative</I></B>&nbsp;then it is <B><I>attractive</I></B>&nbsp;- it tries 
+to <B><I>minimize</I></B>&nbsp;the distance between the particles.<BR></DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5><BR></DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5>Tip - When using attractive power laws 
+with large negative exponents you may find it is useful to include a small 
+negative Cutoff value. This is because otherwise at very short distances the 
+force increases so sharply it can cause the particle to dramatically 
+overshoot.&nbsp;</DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5><BR></DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5>Other Forces</DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5>(descriptions coming shortly)</DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5><BR></DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5>Planarization</DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5>Pressure</DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5>Constraining to a surface</DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5>Brep Collisions</DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5>Equalization</DIV>
+<DIV style="TEXT-ALIGN: left" id=xyh5>Rockets</DIV>
+<H3><U>Combining forces</U></H3>
+<DIV>* include something about combination forces such as Lennard-Jones 
+here</DIV><BR>
+<DIV><B><U>Unary Forces</U></B></DIV><B><U><BR></U></B>
+<DIV>These have already been covered a bit earlier in the section on Mass and 
+weight.</DIV>
+<DIV>They can also be used to add other forces which are not dependent on the 
+distance between particles, such as simple wind loads.</DIV><BR>
+<DIV><B><U>Drag</U></B></DIV><BR>Drag is a force which acts on particles 
+opposing their direction of motion. The faster the particle is moving, the 
+greater the force.</DIV>
+<DIV>Kangaroo has several sorts of damping :</DIV>
+<DIV>Global damping - which is applied uniformly to all particles in the 
+simulation. The 'Drag' input allows you to set the strength of this. Values 
+between 1 and 30 seem to work well. You may find you need to experiment with 
+different values to get the effect you want. For example when form-finding a 
+catenary roof, if the damping is set too low, the form fall then bounce back up 
+and oscillate for a long time before settling into the desired equilibrium. If 
+damping is set too high it wall fall very slowly, as if through treacle.</DIV>
+<DIV>Spring Damping - This force is a setting for springs, which also opposes 
+the movement of the particles, but only in the direction of the spring. So for 
+example a horizontally stretched spring with spring-damping allowed to fall 
+freely under gravity will still reach the ground in the same length of time, 
+although its length oscillations will reduce.</DIV><BR>
+<DIV>(Entropy, energy loss...)</DIV><BR>
+<DIV>
+<DIV><B><U>Outputs</U></B></DIV><BR>
+<DIV><I>Explanation of Geometry Tree to go here</I></DIV><BR>
+<DIV>Troubleshooting</DIV><BR>
+<DIV><B>-The simulation oscillates wildly or explodes</B></DIV>
+<DIV>Because Kangaroo is numerically approximating continuous* behaviour with 
+discrete time steps, errors can occur. Usually these errors remain very small, 
+but when dealing with very stiff springs, particles sometimes overshoot in a way 
+that builds up rapidly, causing the whole system to fly apart.</DIV>
+<DIV>The solution is either to use softer springs or to decrease the timestep 
+(try reducing it by a factor of 10, eg from 0.01 to 0.001). Increasing Drag or 
+Spring Damping can also help. Smaller timestep means more calculation steps for 
+the same amount of movement, so the simulation will run slower. One way to 
+counteract this is to increase the value of SubIterations (typically by the same 
+factor you reduced the timestep). This means that multiple calculations of the 
+particles' positions occur between the ones which &nbsp;you actually see on the 
+screen.</DIV><BR>* Well it seems continuous, but is time really continuous or 
+discrete ? That's a question for another time!</DIV><BR>
+<DIV>Other sections to add:</DIV><BR>
+<DIV>Tracing particles</DIV><BR>
+<DIV>producing animations (slider)</DIV><BR>
+<DIV>speedup tips (system process priority)</DIV><BR><BR><U>References/Further 
+reading</U><BR><BR>
+<DIV>Baraff &amp; Witkin's Siggraph '97 course notes</DIV>
+<DIV><A 
+href="http://www.cs.cmu.edu/~baraff/sigcourse/">http://www.cs.cmu.edu/~baraff/sigcourse/</A><BR></DIV>
+<DIV><A 
+href="http://www.pixar.com/companyinfo/research/pbm2001/">http://www.pixar.com/companyinfo/research/pbm2001/</A><BR></DIV><BR>
+<DIV>Physics-based generative design</DIV>
+<DIV>Ramtin Attar, Robert Aish, Jos Stam, Duncan&nbsp;</DIV>
+<DIV>Brinsmead, Alex Tessier, Michael Glueck,</DIV>
+<DIV>Azam Khan</DIV>
+<DIV><A 
+href="http://www.autodeskresearch.com/pdf/CF09PhysicsGenDesign.pdf">http://www.autodeskresearch.com/pdf/CF09PhysicsGenDesign.pdf</A><BR></DIV><A 
+href="http://www.autodeskresearch.com/projects/complexconstraint">http://www.autodeskresearch.com/projects/complexconstraint</A>
+<DIV><A href="http://www.autodeskresearch.com/projects/complexconstraint"></A><A 
+href="http://www.autodeskresearch.com/projects/nucleus">http://www.autodeskresearch.com/projects/nucleus</A></DIV><BR>
+<DIV>Physically based deformable models in Computer graphics</DIV>
+<DIV>Andrew Nealen, Matthias Müller, Richard Keiser, Eddy Boxerman, Mark 
+Carlson<BR></DIV><A id=t92k 
+title=http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.124.4664&amp;rep=rep1&amp;type=pdf 
+href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.124.4664&amp;rep=rep1&amp;type=pdf">http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.124.4664&amp;rep=rep1&amp;type=pdf</A><BR><BR>
+<DIV><A href="http://www.autodeskresearch.com/projects/nucleus"></A><A 
+href="http://www.matthiasmueller.info/realtimephysics/">http://www.matthiasmueller.info/realtimephysics/</A></DIV><BR>
+<DIV><A href="http://www.matthiasmueller.info/realtimephysics/"></A>
+<DIV>Jeffrey Traer Bernstein's Traer Physics<BR>
+<DIV><A 
+href="http://murderandcreate.com/physics/">http://murderandcreate.com/physics/</A></DIV>
+<DIV><A href="http://murderandcreate.com/physics/"></A><BR>
+<DIV>lots more to add here<BR><BR><U>Future development plans</U></DIV><BR>
+<DIV>new forces to add:</DIV><BR>
+<DIV><I>vortex filament/driveshaft/hingespring</I></DIV>
+<DIV>To rotate one particle about a line segment. Could be Biot-Savart like, or 
+like PLaw where user has a choice of how distance affects strength. Useful for 
+wheels, folding...</DIV><BR><I>alignment</I>
+<DIV>align 2 line segments which are not necessarily contiguous. could be used 
+for flocking</DIV><BR>
+<DIV><I>bending with non-straight rest angle</I></DIV>
+<DIV>eg to constrain 2 segments to be perpendicular</DIV><BR><I>wind</I>
+<DIV>area dependent like pressure, but projected onto a wind vector<BR><BR>
+<DIV><I>air resistance</I></DIV>
+<DIV>like wind, but opposed to the motion of the triangle</DIV><BR>
+<DIV><I>shear</I></DIV>2 line segments try to keep the same normal 
+plane</DIV><BR>
+<DIV><I>plate/shell elements ?</I></DIV>
+<DIV>This is a tricky one - would really appreciate suggestions 
+here...</DIV><I><BR></I>
+<DIV><I>breakable springs</I></DIV><BR>Add/improve integration methods<BR><BR>
+<DIV>Total Kinetic Energy output (and maybe an option to run the simulation 
+until this falls below a certain level)</DIV><BR><B><I>If you have any 
+suggestions or requests for other forces to add, please let me 
+know</I></B><BR><BR><BR><BR><BR></DIV></DIV><BR></DIV><BR></DIV><BR></DIV><BR></DIV><BR><BR 
+clear=all></DIV>
+<DIV id=google-view-footer>
+<DIV style="FLOAT: right" id=maybecanedit><A id=editpermissionlink 
+class=google-small-link title=编辑此页 
+href="https://docs.google.com/Doc?tab=edit&amp;dr=true&amp;id=ddpv99dx_44f88c75fh">编辑此页面（如果您有权限）</A> 
+<SPAN style="COLOR: #676767">|</SPAN> <A id=report-abuse-link 
+class=google-small-link 
+href="https://docs.google.com/abuse?id=0Ad1a4gfYAaNkZGRwdjk5ZHhfNDRmODhjNzVmaA">报告滥用行为</A></DIV>
+<DIV style="FLOAT: left"><A class=google-small-link title="了解“Google 文档”的详细信息" 
+href="https://docs.google.com/">Google 文档 － 网络文字处理、演示文稿和电子表格。</A> </DIV>
+<P> </P></DIV>
+<SCRIPT><!--
+    viewOnLoad();
+    if(window.jstiming){window.jstiming.a={};window.jstiming.b=1;var k=function(c,a,f){var b=c.t[a],g=c.t.start;if(b&&(g||f))return b=c.t[a][0],f!=void 0?g=f:g=g[0],b-g},n=function(c,a,f){var b="";window.jstiming.pt&&(b+="&srt="+window.jstiming.pt,delete window.jstiming.pt);try{window.external&&window.external.tran?b+="&tran="+window.external.tran:window.gtbExternal&&window.gtbExternal.tran?b+="&tran="+window.gtbExternal.tran():window.chrome&&window.chrome.csi&&(b+="&tran="+window.chrome.csi().tran)}catch(g){}var d=
+window.chrome;if(d&&(d=d.loadTimes))d().wasFetchedViaSpdy&&(b+="&p=s"),d().wasNpnNegotiated&&(b+="&npn=1"),d().wasAlternateProtocolAvailable&&(b+="&apa=1");c.c&&(b+="&"+c.c);var h=c.t,m=h.start,d=[],i=[],e;for(e in h)if(e!="start"&&e.indexOf("_")!=0){var j=h[e][1];j?h[j]&&i.push(e+"."+k(c,e,h[j][0])):m&&d.push(e+"."+k(c,e))}delete h.start;if(a)for(var l in a)b+="&"+l+"="+a[l];(a=f)||(a="https:"==document.location.protocol?"http://csi.gstatic.com/csi":"http://csi.gstatic.com/csi");return[a,"?v=3",
+"&s="+(window.jstiming.sn||"writely")+"&action=",c.name,i.length?"&it="+i.join(","):"","",b,"&rt=",d.join(",")].join("")};window.jstiming.report=function(c,a,f){c=n(c,a,f);if(!c)return"";var a=new Image,b=window.jstiming.b++;window.jstiming.a[b]=a;a.onload=a.onerror=function(){delete window.jstiming.a[b]};a.src=c;a=null;return c}};
+
+    window.jstiming.load.name = 'published';
+    
+    
+    var urchinPage = "/View";
+
+    
+    function getXHR() {
+      if (typeof XMLHttpRequest != "undefined") {
+        return new XMLHttpRequest();
+      }
+      try { return new ActiveXObject("Msxml2.XMLHTTP.6.0") } catch(e) {}
+      try { return new ActiveXObject("Msxml2.XMLHTTP.3.0") } catch(e) {}
+      try { return new ActiveXObject("Msxml2.XMLHTTP") } catch(e) {}
+      try { return new ActiveXObject("Microsoft.XMLHTTP") } catch(e) {}
+      return null;
+    }
+  --></SCRIPT>
+</BODY></HTML>
+
