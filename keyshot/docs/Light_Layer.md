@@ -11,7 +11,7 @@
 
 ![图片](images/灯光层板块02.png)
 
-![图片](images/灯光层板块01.png)
+![图片](images/灯光层01.png)
 
 ![图片](images/灯光层板块.png)
 
