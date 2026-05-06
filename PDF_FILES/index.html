@@ -201,7 +201,22 @@
         }
         @keyframes spin { 100% { transform: rotate(360deg); } }
         .hidden { display: none !important; }
-
+        
+        /* 搜索高亮 */
+        .toc-subgroup {
+            padding-left: 15px;
+        }
+        
+        .search-highlight {
+            background-color: #ffeb3b;
+            color: #333;
+        }
+        
+        .no-result {
+            padding: 15px;
+            color: #999;
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -223,7 +238,7 @@
         </div>
         <div class="currentPDF" id="currentPDF">软件帮助中心</div>
         <div class="searchBox">
-            <input id="searchBox" placeholder="搜索...">
+            <input id="searchBox" placeholder="搜索目录..." onkeyup="search()">
             <button onclick="search()"><i class="fas fa-search"></i></button>
         </div>
     </div>
@@ -259,6 +274,7 @@
         let pageNum = 1;
         let currentPdfUrl = null;
         let isRendering = false;
+        let currentOutline = null; // 保存完整的目录结构
 
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -355,6 +371,7 @@
             showLoading("正在打开 PDF...");
             document.getElementById("currentPDF").innerText = name.replace(".pdf", "");
             document.getElementById("toc").innerHTML = "<h3>PDF 目录</h3>";
+            currentOutline = null;
 
             pdfjsLib.getDocument(url).promise.then(pdf => {
                 pdfDoc = pdf;
@@ -399,35 +416,191 @@
         function prevPage() { if (pageNum > 1) { pageNum--; renderPage(pageNum); } }
         function nextPage() { if (pageNum < pdfDoc.numPages) { pageNum++; renderPage(pageNum); } }
 
-        // --- 目录加载 ---
+        // --- 目录加载（支持递归搜索）---
         function loadTOC() {
+            if (!pdfDoc) return;
+            
             pdfDoc.getOutline().then(outline => {
+                currentOutline = outline;
                 const container = document.getElementById("toc");
                 if (!outline || outline.length === 0) {
                     container.innerHTML += "<p style='padding:15px'>无目录</p>";
                     return;
                 }
+                
+                // 清空容器，保留标题
+                container.innerHTML = "<h3>PDF 目录</h3>";
+                
                 const renderItems = (items, parent) => {
                     items.forEach(item => {
                         const a = document.createElement("a");
                         a.textContent = item.title;
+                        a.className = "toc-link";
                         a.onclick = async () => {
-                            const dest = await pdfDoc.getDestination(item.dest);
-                            const index = await pdfDoc.getPageIndex(dest[0]);
-                            pageNum = index + 1;
-                            renderPage(pageNum);
-                            if (window.innerWidth < 768) closeSidebars();
+                            try {
+                                const dest = await pdfDoc.getDestination(item.dest);
+                                if (dest && dest[0]) {
+                                    const index = await pdfDoc.getPageIndex(dest[0]);
+                                    pageNum = index + 1;
+                                    renderPage(pageNum);
+                                    if (window.innerWidth < 768) closeSidebars();
+                                }
+                            } catch (e) {
+                                console.error("目录跳转失败:", e);
+                            }
                         };
                         parent.appendChild(a);
-                        if (item.items.length > 0) {
-                            const sub = document.createElement("div");
-                            sub.style.paddingLeft = "15px";
-                            parent.appendChild(sub);
-                            renderItems(item.items, sub);
+                        
+                        if (item.items && item.items.length > 0) {
+                            const subDiv = document.createElement("div");
+                            subDiv.className = "toc-subgroup";
+                            parent.appendChild(subDiv);
+                            renderItems(item.items, subDiv);
                         }
                     });
                 };
+                
                 renderItems(outline, container);
+            }).catch(err => {
+                console.error("加载目录失败:", err);
+                document.getElementById("toc").innerHTML += "<p style='padding:15px'>目录加载失败</p>";
+            });
+        }
+
+        // --- 递归搜索功能（支持所有层级的目录）---
+        function search() {
+            const keyword = document.getElementById("searchBox").value.toLowerCase().trim();
+            const allLinks = document.querySelectorAll("#toc .toc-link");
+            const tocContainer = document.getElementById("toc");
+            
+            // 移除之前的高亮和提示
+            removeHighlights();
+            
+            if (keyword === "") {
+                // 清空搜索时，显示所有链接和它们的父容器
+                allLinks.forEach(link => {
+                    link.style.display = "block";
+                    // 逐级显示父容器（如果之前被隐藏）
+                    let parent = link.parentElement;
+                    while (parent && parent !== tocContainer && parent !== document) {
+                        parent.style.display = "block";
+                        parent = parent.parentElement;
+                    }
+                });
+                return;
+            }
+            
+            // 第一步：先隐藏所有链接
+            allLinks.forEach(link => {
+                link.style.display = "none";
+            });
+            
+            let matchCount = 0;
+            
+            // 第二步：显示匹配的链接，并高亮关键词
+            allLinks.forEach(link => {
+                const text = link.textContent.toLowerCase();
+                if (text.includes(keyword)) {
+                    link.style.display = "block";
+                    matchCount++;
+                    
+                    // 高亮显示匹配的关键词
+                    highlightText(link, keyword);
+                    
+                    // 显示该链接的所有父级容器（确保嵌套结构可见）
+                    let parent = link.parentElement;
+                    while (parent && parent !== tocContainer && parent !== document) {
+                        parent.style.display = "block";
+                        parent = parent.parentElement;
+                    }
+                }
+            });
+            
+            // 显示搜索结果提示
+            showSearchResult(matchCount, keyword);
+        }
+        
+        // 高亮显示文本中的关键词
+        function highlightText(element, keyword) {
+            const originalText = element.textContent;
+            if (!originalText.toLowerCase().includes(keyword)) return;
+            
+            // 创建正则表达式，不区分大小写
+            const regex = new RegExp(`(${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            const highlightedHtml = originalText.replace(regex, '<span class="search-highlight">$1</span>');
+            
+            // 保存原始点击事件
+            const originalOnClick = element.onclick;
+            
+            // 创建新的元素替换
+            const newElement = document.createElement("a");
+            newElement.className = element.className;
+            newElement.innerHTML = highlightedHtml;
+            newElement.onclick = originalOnClick;
+            newElement.style.display = element.style.display;
+            
+            // 替换原元素
+            element.parentNode.replaceChild(newElement, element);
+        }
+        
+        // 移除所有高亮
+        function removeHighlights() {
+            const highlightedSpans = document.querySelectorAll('.search-highlight');
+            highlightedSpans.forEach(span => {
+                const parent = span.parentNode;
+                parent.innerHTML = parent.textContent; // 恢复原始文本
+            });
+            
+            // 移除搜索结果提示
+            const resultDiv = document.getElementById('searchResultInfo');
+            if (resultDiv) resultDiv.remove();
+        }
+        
+        // 显示搜索结果信息
+        function showSearchResult(count, keyword) {
+            // 移除旧的提示
+            const oldResult = document.getElementById('searchResultInfo');
+            if (oldResult) oldResult.remove();
+            
+            const tocContainer = document.getElementById("toc");
+            const resultDiv = document.createElement("div");
+            resultDiv.id = "searchResultInfo";
+            resultDiv.className = "no-result";
+            
+            if (count === 0) {
+                resultDiv.textContent = `未找到包含 "${keyword}" 的目录项`;
+                resultDiv.style.backgroundColor = "#fff3cd";
+                resultDiv.style.color = "#856404";
+            } else {
+                resultDiv.textContent = `找到 ${count} 个包含 "${keyword}" 的目录项`;
+                resultDiv.style.backgroundColor = "#d4edda";
+                resultDiv.style.color = "#155724";
+            }
+            
+            // 插入到标题后面
+            const title = tocContainer.querySelector("h3");
+            if (title && title.nextSibling) {
+                tocContainer.insertBefore(resultDiv, title.nextSibling);
+            } else {
+                tocContainer.appendChild(resultDiv);
+            }
+            
+            // 3秒后自动隐藏提示
+            setTimeout(() => {
+                if (resultDiv.parentNode) {
+                    resultDiv.style.opacity = "0";
+                    setTimeout(() => {
+                        if (resultDiv.parentNode) resultDiv.remove();
+                    }, 300);
+                }
+            }, 3000);
+        }
+        
+        // 实时搜索（输入时自动搜索）
+        function setupRealTimeSearch() {
+            const searchInput = document.getElementById("searchBox");
+            searchInput.addEventListener("input", function() {
+                search();
             });
         }
 
@@ -436,14 +609,9 @@
             document.getElementById("loadingText").innerText = txt;
             document.getElementById("loadingOverlay").classList.remove("hidden");
         }
+        
         function hideLoading() {
             document.getElementById("loadingOverlay").classList.add("hidden");
-        }
-        function search() {
-            const q = document.getElementById("searchBox").value.toLowerCase();
-            document.querySelectorAll("#toc a").forEach(a => {
-                a.style.display = a.textContent.toLowerCase().includes(q) ? "block" : "none";
-            });
         }
 
         // --- 触摸翻页支持 ---
@@ -451,6 +619,7 @@
         document.getElementById('pdfViewer').addEventListener('touchstart', e => {
             touchStartX = e.changedTouches[0].screenX;
         }, false);
+        
         document.getElementById('pdfViewer').addEventListener('touchend', e => {
             let touchEndX = e.changedTouches[0].screenX;
             if (touchEndX < touchStartX - 80) nextPage();
@@ -464,7 +633,12 @@
             else document.getElementById('pdfViewer').style.paddingLeft = '0';
         });
 
-        document.addEventListener("DOMContentLoaded", loadFolders);
+        // 初始化
+        document.addEventListener("DOMContentLoaded", () => {
+            loadFolders();
+            setupRealTimeSearch();
+        });
     </script>
 </body>
+
 </html>
