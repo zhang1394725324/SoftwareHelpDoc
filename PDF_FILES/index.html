@@ -269,12 +269,17 @@
     <script>
         const owner = "zhang1394725324";
         const repo = "SoftwareHelpDoc";
+        
+        // ========== 重要：请修改这里的路径为你的子文件夹名称 ==========
+        const currentPath = "PDF_FILES";  // 改成你的子文件夹名，比如 "help" 或 "docs"
+        // 如果 HTML 在仓库根目录，就设为空字符串 ""
+        // ============================================================
 
         let pdfDoc = null;
         let pageNum = 1;
         let currentPdfUrl = null;
         let isRendering = false;
-        let currentOutline = null; // 保存完整的目录结构
+        let currentOutline = null;
 
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -284,7 +289,6 @@
             const mask = document.getElementById('mask');
             const isActive = panel.classList.contains('active');
 
-            // 手机端切换时关闭另一个
             if (window.innerWidth < 768) {
                 document.querySelectorAll('.sidebar, .toc').forEach(el => el.classList.remove('active'));
                 document.querySelectorAll('.menuBtn').forEach(el => el.classList.remove('active'));
@@ -303,7 +307,6 @@
                 mask.style.display = 'none';
             }
 
-            // PC端推挤效果
             if (window.innerWidth >= 768) {
                 updatePCLayout();
             }
@@ -323,46 +326,101 @@
             document.getElementById('pdfViewer').style.paddingLeft = offset + 'px';
         }
 
-        // --- PDF 加载与渲染 ---
+        // --- 修改：支持子文件夹路径 ---
+        function buildApiPath(subPath = '') {
+            let basePath = `https://api.github.com/repos/${owner}/${repo}/contents`;
+            if (currentPath) {
+                basePath += `/${currentPath}`;
+            }
+            if (subPath) {
+                basePath += `/${subPath}`;
+            }
+            return basePath;
+        }
+
         async function loadFolders() {
             showLoading("加载目录中...");
             try {
-                const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents`);
+                const apiUrl = buildApiPath();
+                console.log("请求API:", apiUrl);
+                
+                const res = await fetch(apiUrl);
+                
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                }
+                
                 const data = await res.json();
+                console.log("仓库数据:", data);
+                
                 const list = document.getElementById("softwareList");
                 list.innerHTML = "";
 
+                let hasAnyFolder = false;
+
                 for (const item of data) {
                     if (item.type === "dir") {
+                        hasAnyFolder = true;
                         const h3 = document.createElement("h3");
                         h3.textContent = item.name;
                         list.appendChild(h3);
                         await loadPDFsInFolder(item.name, list);
                     }
                 }
+                
+                if (!hasAnyFolder) {
+                    list.innerHTML = "<p style='padding:15px;color:#999;'>没有找到文件夹<br>请确保当前路径下有包含PDF的文件夹</p>";
+                }
+                
             } catch (e) {
-                alert("GitHub列表加载失败，请检查网络");
+                console.error("加载失败:", e);
+                alert("GitHub列表加载失败: " + e.message + "\n请检查：\n1. currentPath 路径是否正确\n2. 仓库是否公开\n3. 网络是否正常");
+                document.getElementById("softwareList").innerHTML = `<p style='padding:15px;color:red;'>加载失败<br>当前路径: ${currentPath || '根目录'}<br>错误: ${e.message}</p>`;
             } finally {
                 hideLoading();
             }
         }
 
         async function loadPDFsInFolder(folder, container) {
-            const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${folder}`);
-            const files = await res.json();
-            files.forEach(file => {
-                if (file.name.endsWith(".pdf")) {
-                    const a = document.createElement("a");
-                    a.textContent = file.name.replace(".pdf", "");
-                    a.onclick = () => {
-                        document.querySelectorAll("#softwareList a").forEach(el => el.classList.remove("active-link"));
-                        a.classList.add("active-link");
-                        if (window.innerWidth < 768) closeSidebars();
-                        loadPDF(file.download_url, file.name);
-                    };
-                    container.appendChild(a);
+            try {
+                const apiUrl = buildApiPath(folder);
+                console.log("请求文件夹:", apiUrl);
+                
+                const res = await fetch(apiUrl);
+                if (!res.ok) {
+                    console.error(`加载文件夹 ${folder} 失败:`, res.status);
+                    return;
                 }
-            });
+                const files = await res.json();
+                let pdfCount = 0;
+                
+                files.forEach(file => {
+                    if (file.name.toLowerCase().endsWith(".pdf")) {
+                        pdfCount++;
+                        const a = document.createElement("a");
+                        a.textContent = file.name.replace(/\.pdf$/i, "");
+                        a.onclick = () => {
+                            document.querySelectorAll("#softwareList a").forEach(el => el.classList.remove("active-link"));
+                            a.classList.add("active-link");
+                            if (window.innerWidth < 768) closeSidebars();
+                            loadPDF(file.download_url, file.name);
+                        };
+                        container.appendChild(a);
+                    }
+                });
+                
+                if (pdfCount === 0) {
+                    const p = document.createElement("p");
+                    p.textContent = "（该文件夹中没有 PDF 文件）";
+                    p.style.padding = "10px 15px";
+                    p.style.color = "#999";
+                    p.style.fontSize = "12px";
+                    container.appendChild(p);
+                }
+                
+            } catch (e) {
+                console.error(`加载文件夹 ${folder} 出错:`, e);
+            }
         }
 
         function loadPDF(url, name) {
@@ -392,13 +450,11 @@
                 const canvas = document.getElementById("pdfCanvas");
                 const ctx = canvas.getContext("2d");
                 
-                // 关键：针对移动端计算自适应缩放
                 const containerWidth = document.getElementById("canvasContainer").clientWidth - 20;
                 const viewport = page.getViewport({ scale: 1 });
                 const scale = containerWidth / viewport.width;
                 const scaledViewport = page.getViewport({ scale: scale });
 
-                // 提高清晰度
                 const dpr = window.devicePixelRatio || 1;
                 canvas.height = scaledViewport.height * dpr;
                 canvas.width = scaledViewport.width * dpr;
@@ -416,7 +472,6 @@
         function prevPage() { if (pageNum > 1) { pageNum--; renderPage(pageNum); } }
         function nextPage() { if (pageNum < pdfDoc.numPages) { pageNum++; renderPage(pageNum); } }
 
-        // --- 目录加载（支持递归搜索）---
         function loadTOC() {
             if (!pdfDoc) return;
             
@@ -428,7 +483,6 @@
                     return;
                 }
                 
-                // 清空容器，保留标题
                 container.innerHTML = "<h3>PDF 目录</h3>";
                 
                 const renderItems = (items, parent) => {
@@ -467,20 +521,16 @@
             });
         }
 
-        // --- 递归搜索功能（支持所有层级的目录）---
         function search() {
             const keyword = document.getElementById("searchBox").value.toLowerCase().trim();
             const allLinks = document.querySelectorAll("#toc .toc-link");
             const tocContainer = document.getElementById("toc");
             
-            // 移除之前的高亮和提示
             removeHighlights();
             
             if (keyword === "") {
-                // 清空搜索时，显示所有链接和它们的父容器
                 allLinks.forEach(link => {
                     link.style.display = "block";
-                    // 逐级显示父容器（如果之前被隐藏）
                     let parent = link.parentElement;
                     while (parent && parent !== tocContainer && parent !== document) {
                         parent.style.display = "block";
@@ -490,24 +540,18 @@
                 return;
             }
             
-            // 第一步：先隐藏所有链接
             allLinks.forEach(link => {
                 link.style.display = "none";
             });
             
             let matchCount = 0;
             
-            // 第二步：显示匹配的链接，并高亮关键词
             allLinks.forEach(link => {
                 const text = link.textContent.toLowerCase();
                 if (text.includes(keyword)) {
                     link.style.display = "block";
                     matchCount++;
-                    
-                    // 高亮显示匹配的关键词
                     highlightText(link, keyword);
-                    
-                    // 显示该链接的所有父级容器（确保嵌套结构可见）
                     let parent = link.parentElement;
                     while (parent && parent !== tocContainer && parent !== document) {
                         parent.style.display = "block";
@@ -516,49 +560,37 @@
                 }
             });
             
-            // 显示搜索结果提示
             showSearchResult(matchCount, keyword);
         }
         
-        // 高亮显示文本中的关键词
         function highlightText(element, keyword) {
             const originalText = element.textContent;
             if (!originalText.toLowerCase().includes(keyword)) return;
             
-            // 创建正则表达式，不区分大小写
             const regex = new RegExp(`(${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
             const highlightedHtml = originalText.replace(regex, '<span class="search-highlight">$1</span>');
-            
-            // 保存原始点击事件
             const originalOnClick = element.onclick;
             
-            // 创建新的元素替换
             const newElement = document.createElement("a");
             newElement.className = element.className;
             newElement.innerHTML = highlightedHtml;
             newElement.onclick = originalOnClick;
             newElement.style.display = element.style.display;
             
-            // 替换原元素
             element.parentNode.replaceChild(newElement, element);
         }
         
-        // 移除所有高亮
         function removeHighlights() {
             const highlightedSpans = document.querySelectorAll('.search-highlight');
             highlightedSpans.forEach(span => {
                 const parent = span.parentNode;
-                parent.innerHTML = parent.textContent; // 恢复原始文本
+                parent.innerHTML = parent.textContent;
             });
-            
-            // 移除搜索结果提示
             const resultDiv = document.getElementById('searchResultInfo');
             if (resultDiv) resultDiv.remove();
         }
         
-        // 显示搜索结果信息
         function showSearchResult(count, keyword) {
-            // 移除旧的提示
             const oldResult = document.getElementById('searchResultInfo');
             if (oldResult) oldResult.remove();
             
@@ -577,7 +609,6 @@
                 resultDiv.style.color = "#155724";
             }
             
-            // 插入到标题后面
             const title = tocContainer.querySelector("h3");
             if (title && title.nextSibling) {
                 tocContainer.insertBefore(resultDiv, title.nextSibling);
@@ -585,7 +616,6 @@
                 tocContainer.appendChild(resultDiv);
             }
             
-            // 3秒后自动隐藏提示
             setTimeout(() => {
                 if (resultDiv.parentNode) {
                     resultDiv.style.opacity = "0";
@@ -596,7 +626,6 @@
             }, 3000);
         }
         
-        // 实时搜索（输入时自动搜索）
         function setupRealTimeSearch() {
             const searchInput = document.getElementById("searchBox");
             searchInput.addEventListener("input", function() {
@@ -604,7 +633,6 @@
             });
         }
 
-        // --- 辅助功能 ---
         function showLoading(txt) {
             document.getElementById("loadingText").innerText = txt;
             document.getElementById("loadingOverlay").classList.remove("hidden");
@@ -614,7 +642,6 @@
             document.getElementById("loadingOverlay").classList.add("hidden");
         }
 
-        // --- 触摸翻页支持 ---
         let touchStartX = 0;
         document.getElementById('pdfViewer').addEventListener('touchstart', e => {
             touchStartX = e.changedTouches[0].screenX;
@@ -626,14 +653,12 @@
             if (touchEndX > touchStartX + 80) prevPage();
         }, false);
 
-        // 窗口大小改变时重新渲染
         window.addEventListener('resize', () => {
             if (pdfDoc) renderPage(pageNum);
             if (window.innerWidth >= 768) updatePCLayout();
             else document.getElementById('pdfViewer').style.paddingLeft = '0';
         });
 
-        // 初始化
         document.addEventListener("DOMContentLoaded", () => {
             loadFolders();
             setupRealTimeSearch();
