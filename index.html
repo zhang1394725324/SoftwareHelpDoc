@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>HELP</title>
+    <!-- 使用柔和的现代字体，增强阅读体验 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000000;   /* 纯黑背景，深邃底色 */
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.5rem;
+            color: #eef2ff;
+        }
+
+        /* 主容器 — 卡片式玻璃质感，衬托按钮 */
+        .container {
+            max-width: 880px;
+            width: 100%;
+            margin: 0 auto;
+            background: rgba(5, 5, 10, 0.65);
+            backdrop-filter: blur(2px);
+            border-radius: 3rem;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(75, 130, 200, 0.15);
+            transition: all 0.2s ease;
+        }
+
+        /* 标题区域，轻微科技感 */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #FFFFFF 0%, #B0B8FF 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .header .glow-tag {
+            font-size: 0.9rem;
+            color: #9ca3cf;
+            margin-top: 0.6rem;
+            border-top: 1px dashed #2a2e4a;
+            display: inline-block;
+            padding-top: 0.6rem;
+            letter-spacing: 1px;
+        }
+
+        /* 按钮网格 — 响应式，优雅弹窗 */
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.4rem;
+            margin-bottom: 2rem;
+        }
+
+        /* 按钮样式 — 黑色主调 + 边缘光感 + 悬浮动效 */
+        .btn-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: #0a0a0f;
+            backdrop-filter: blur(4px);
+            padding: 1rem 1rem;
+            border-radius: 2rem;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            letter-spacing: 0.3px;
+            color: #f0f3ff;
+            border: 1px solid #2c2f3e;
+            transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+        }
+
+        /* 按钮内的图标模拟 (使用简单unicode/emoji，也可以后期换成字体图标，但足够优雅) */
+        .btn-link .btn-icon {
+            font-size: 1.4rem;
+            filter: drop-shadow(0 0 2px rgba(80,150,255,0.3));
+            transition: transform 0.2s;
+        }
+
+        .btn-link span {
+            transition: transform 0.2s;
+        }
+
+        /* 悬浮特效: 边框光效 + 提升 + 颜色微变 */
+        .btn-link:hover {
+            background: #11131f;
+            border-color: #5f7ef2;
+            box-shadow: 0 12px 22px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(95, 126, 242, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .btn-link:hover .btn-icon {
+            transform: scale(1.08);
+        }
+
+        .btn-link:active {
+            transform: translateY(1px);
+            transition: 0.05s;
+        }
+
+        /* 个别特殊按钮可以加不同的光晕，但一致性更高，也可以定义次级样式 */
+        /* 底部说明或脚注 */
+        .footer-note {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #6b728c;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(55, 65, 90, 0.6);
+            padding-top: 1.5rem;
+            letter-spacing: 0.3px;
+        }
+
+        .footer-note a {
+            color: #9aa9f0;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-note a:hover {
+            color: #cbd5ff;
+            text-decoration: underline;
+        }
+
+        /* 额外装饰小光点 (增加太空感) */
+        .glow-dot {
+            position: fixed;
+            width: 260px;
+            height: 260px;
+            background: radial-gradient(circle, rgba(66, 100, 235, 0.12) 0%, rgba(0,0,0,0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+            top: 10%;
+            left: -5%;
+        }
+
+        .glow-dot-right {
+            position: fixed;
+            bottom: 0;
+            right: -80px;
+            width: 320px;
+            height: 320px;
+            background: radial-gradient(circle, rgba(140, 82, 255, 0.1) 0%, rgba(0,0,0,0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* 让手机上的触摸区域更舒适 */
+        @media (max-width: 560px) {
+            .container {
+                padding: 1.8rem 1.2rem;
+            }
+            .button-grid {
+                gap: 1rem;
+            }
+            .btn-link {
+                padding: 0.85rem 0.8rem;
+                font-size: 1rem;
+            }
+            .header h1 {
+                font-size: 1.9rem;
+            }
+        }
+
+        /* 为了适配深色模式无缝，body本来就是黑色，没有额外操作 */
+        /* 添加一个简单的鼠标跟随光晕（可选，提升趣味）但不会影响性能太多 */
+        .cursor-effect {
+            position: fixed;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(130,170,255,0.3), rgba(0,0,0,0));
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            transition: 0.05s linear;
+            z-index: 9999;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="glow-dot"></div>
+<div class="glow-dot-right"></div>
+
+<main class="container">
+    <div class="header">
+        <h1>✦ 暗黑链接库 ✦</h1>
+        <div class="glow-tag">// 深邃触达 · 一键启程</div>
+    </div>
+
+    <div class="button-grid">
+        <!-- 所有按钮均为真实的链接，新标签页打开，可根据实际GitHub Pages项目仓库替换链接 -->
+        <!-- 第一个按钮：Keyshot文档 -->
+        <a href="https://github.com" class="btn-link" target="_blank" rel="noopener noreferrer">
+            <span class="btn-icon">⌨️</span>
+            <span>Keyshot文档</span>
+        </a>
+        <!-- 第二个：Rhino文档 -->
+        <a href="https://github.com/trending" class="btn-link" target="_blank" rel="noopener noreferrer">
+            <span class="btn-icon">📈</span>
+            <span>Rhino文档</span>
+        </a>
+        <!-- 第三个：Grasshopper文档 -->
+        <a href="https://opensource.guide" class="btn-link" target="_blank" rel="noopener noreferrer">
+            <span class="btn-icon">📘</span>
+            <span>Grasshopper文档</span>
+        </a>
+        <!-- 第四个：开发者文档集合 (GitHub Docs) -->
+        <a href="https://docs.github.com" class="btn-link" target="_blank" rel="noopener noreferrer">
+            <span class="btn-icon">📖</span>
+            <span>PDF文档</span>
+        </a>
+        <!-- 第五个：敬请期待 -->
+        <a href="https://pages.github.com" class="btn-link" target="_blank" rel="noopener noreferrer">
+            <span class="btn-icon">🌐</span>
+            <span>敬请期待</span>
+        </a>
+        <!-- 第六个：Awesome 清单库 (经典) -->
+        <a href="https://github.com/sindresorhus/awesome" class="btn-link" target="_blank" rel="noopener noreferrer">
+            <span class="btn-icon">🌟</span>
+            <span>Awesome 列表</span>
+        </a>
+        <!-- 第七个：GitHub 技能提升 -->
+        <a href="https://skills.github.com" class="btn-link" target="_blank" rel="noopener noreferrer">
+            <span class="btn-icon">🚀</span>
+            <span>GitHub 技能</span>
+        </a>
+        <!-- 第八个：开源许可选择工具 -->
+        <a href="https://choosealicense.com" class="btn-link" target="_blank" rel="noopener noreferrer">
+            <span class="btn-icon">⚖️</span>
+            <span>选择许可证</span>
+        </a>
+        <!-- 第九个：GitHub 讨论区探索 -->
+        <a href="https://github.com/features/discussions" class="btn-link" target="_blank" rel="noopener noreferrer">
+            <span class="btn-icon">💬</span>
+            <span>社区讨论</span>
+        </a>
+        <!-- 第十个：GitHub Actions 市场 -->
+        <a href="https://github.com/marketplace?type=actions" class="btn-link" target="_blank" rel="noopener noreferrer">
+            <span class="btn-icon">⚙️</span>
+            <span>Actions 市场</span>
+        </a>
+        <!-- 十一个：静态资源库示例（个人或项目链接可自行替换，此处留通用酷站） -->
+        <a href="https://developer.mozilla.org" class="btn-link" target="_blank" rel="noopener noreferrer">
+            <span class="btn-icon">📚</span>
+            <span>MDN 文档</span>
+        </a>
+        <!-- 十二个：CSS Tricks 现代前端 -->
+        <a href="https://css-tricks.com" class="btn-link" target="_blank" rel="noopener noreferrer">
+            <span class="btn-icon">🎨</span>
+            <span>CSS-Tricks</span>
+        </a>
+    </div>
+    
+    <div class="footer-note">
+        🔗 所有按钮均可直达 — 暗黑界面 | 快速链接矩阵 · 
+        <a href="#" id="fakeReload" style="cursor:pointer;">✨ 星际漫游 ✨</a>
+    </div>
+</main>
+
+<!-- 简单的点击特效/动态更新提示, 提升交互感 but 干净轻量 -->
+<script>
+    (function() {
+        // 优雅的小彩蛋：点击页脚文字控制台输出彩蛋，完全不影响链接功能
+        const easter = document.getElementById('fakeReload');
+        if(easter) {
+            easter.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log("%c✨ 欢迎来到暗黑链接矩阵 | 设计完成于 GitHub Pages 氛围 ✨", "color: #9f7eff; font-size: 14px; font-weight: bold;");
+                alert('🪐 探索愉快 · 所有按钮都已链接至真实资源网站，可放心使用！');
+            });
+        }
+
+        // 可选: 动态增加跟鼠标的微光晕效果(提升精致感)
+        const cursorDiv = document.createElement('div');
+        cursorDiv.className = 'cursor-effect';
+        document.body.appendChild(cursorDiv);
+        let mouseX = 0, mouseY = 0;
+        let divX = 0, divY = 0;
+        let active = false;
+        
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            if(!active) {
+                cursorDiv.style.opacity = '0.6';
+                active = true;
+            }
+        });
+        
+        function followMouse() {
+            divX += (mouseX - divX) * 0.2;
+            divY += (mouseY - divY) * 0.2;
+            cursorDiv.style.left = divX + 'px';
+            cursorDiv.style.top = divY + 'px';
+            requestAnimationFrame(followMouse);
+        }
+        followMouse();
+        
+        // 当鼠标离开窗口稍微淡化
+        document.addEventListener('mouseleave', () => {
+            cursorDiv.style.opacity = '0';
+            active = false;
+        });
+        document.addEventListener('mouseenter', (e) => {
+            if(e.clientX > 0 && e.clientY > 0) {
+                cursorDiv.style.opacity = '0.6';
+                active = true;
+            }
+        });
+        
+        // 可添加额外的小点缀：对按钮点击时给予迅捷的波纹视觉反馈（可选）
+        const allBtns = document.querySelectorAll('.btn-link');
+        allBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // 纯视觉微效：不干扰默认行为，只加一个极短的波纹影子类 (为了体验)
+                const originalTransition = btn.style.transition;
+                btn.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    btn.style.transform = '';
+                }, 120);
+            });
+        });
+        
+        // 控制台输出站点信息，友好
+        console.log('⬛ 黑色主题 GitHub Pages 页面已就绪 | 按钮数量: ' + allBtns.length);
+    })();
+</script>
+</body>
+</html>
