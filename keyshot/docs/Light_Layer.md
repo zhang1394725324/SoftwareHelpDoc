@@ -9,11 +9,11 @@
 位置: 场景 > 模型 > 属性 > 灯光层，（图中黄色框中的命令可以调出灯光层板块的详细窗口。）
 ```
 
-![图片](images/灯光层板块02.png)
+![图片](images/LightLayer02.png)
 
-![图片](images/灯光层01.png)
+![图片](images/LightLayer01.png)
 
-![图片](images/灯光层板块.png)
+![图片](images/LightLayer04.png)
 
 如图；
 
